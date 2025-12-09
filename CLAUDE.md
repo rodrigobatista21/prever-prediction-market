@@ -61,7 +61,7 @@ User Action → React Hook → Supabase RPC → PostgreSQL Stored Procedure
 ### Database Schema
 
 **Tables:**
-- `profiles` - Extended auth.users (cpf, is_admin flag)
+- `profiles` - Extended auth.users (full_name, avatar_url, is_admin flag)
 - `markets` - pool_yes, pool_no, outcome (null=open, true/false=resolved)
 - `ledger_entries` - amount (+ for credit, - for debit), category enum
 - `market_positions` - shares_yes, shares_no, avg_cost per user/market
@@ -75,18 +75,20 @@ User Action → React Hook → Supabase RPC → PostgreSQL Stored Procedure
 - `rpc_deposit_mock(p_user_id, p_amount)` - Dev testing only
 - `get_user_balance(p_user_id)` - Returns SUM(amount) from ledger
 
-### CPMM Math
+### CPMM Math (Money Wagered Model)
 
 ```
-k = pool_yes × pool_no (constant product invariant)
+pool_yes = total money wagered on YES
+pool_no  = total money wagered on NO
 
-Price_YES = pool_no / (pool_yes + pool_no)
-Price_NO  = pool_yes / (pool_yes + pool_no)
+Price_YES = pool_yes / (pool_yes + pool_no)
+Price_NO  = pool_no / (pool_yes + pool_no)
 
 Buy YES with $X:
   new_pool_yes = pool_yes + X
-  new_pool_no  = k / new_pool_yes
-  shares_out   = pool_no - new_pool_no
+  shares_out   = X / price_yes (at average execution price)
+
+Note: Price of YES increases as more money is bet on YES (demand drives price up)
 ```
 
 ## Critical Rules

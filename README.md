@@ -122,44 +122,46 @@ Acesse [http://localhost:3000](http://localhost:3000).
 
 ## Como Funciona o CPMM
 
-O TesePro usa **Constant Product Market Maker** (similar ao Uniswap) para precificação automática.
+O TesePro usa **Constant Product Market Maker** com modelo de "dinheiro apostado" para precificação automática.
 
-### Fórmula Base
+### Modelo de Precificação
 
-```
-k = pool_yes × pool_no  (constante)
-```
+Diferente do modelo tradicional de AMM (liquidez), usamos um modelo onde:
+- **pool_yes** = total de dinheiro apostado em SIM
+- **pool_no** = total de dinheiro apostado em NÃO
+- O preço reflete a proporção do dinheiro apostado em cada lado
 
 ### Cálculo de Preço (Probabilidade)
 
 ```
-Preço SIM = pool_no / (pool_yes + pool_no)
-Preço NÃO = pool_yes / (pool_yes + pool_no)
+Preço SIM = pool_yes / (pool_yes + pool_no)
+Preço NÃO = pool_no / (pool_yes + pool_no)
 ```
+
+> **Nota:** O preço de SIM aumenta conforme mais dinheiro é apostado em SIM (maior demanda = maior preço).
 
 ### Exemplo: Compra de R$ 100 no SIM
 
 ```
 Estado inicial:
   pool_yes = 1000, pool_no = 1000
-  k = 1.000.000
-  Preço SIM = 50%
+  Preço SIM = 1000 / 2000 = 50%
 
 Usuário compra R$ 100 no SIM:
   novo_pool_yes = 1000 + 100 = 1100
-  novo_pool_no = k / 1100 = 909.09
+  pool_no permanece = 1000
 
-  shares_recebidas = 1000 - 909.09 = 90.91 ações
+  shares_recebidas = 100 / 0.50 = 200 ações (ao preço médio)
 
 Novo preço:
-  Preço SIM = 909.09 / 2009.09 = 45.2%
+  Preço SIM = 1100 / 2100 = 52.4%
 ```
 
 ### Pagamento
 
 Quando o mercado resolve:
 - Cada ação do lado vencedor vale **R$ 1,00**
-- Usuário com 90.91 ações SIM recebe R$ 90,91 se SIM ganhar
+- Usuário com 200 ações SIM recebe R$ 200 se SIM ganhar
 
 ---
 
@@ -169,7 +171,7 @@ Quando o mercado resolve:
 
 | Tabela | Descrição |
 |--------|-----------|
-| `profiles` | Extensão do auth.users (nome, CPF, is_admin) |
+| `profiles` | Extensão do auth.users (nome, avatar, is_admin) |
 | `markets` | Mercados de previsão (pools, outcome, ends_at) |
 | `ledger_entries` | Transações financeiras (DEPOSIT, TRADE, PAYOUT) |
 | `market_positions` | Posições dos usuários (shares_yes, shares_no) |
