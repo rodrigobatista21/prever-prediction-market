@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { checkRateLimit, formatRateLimitError } from '@/lib/utils/rate-limiter'
 import type { BuySharesResponse, SellSharesResponse, DepositResponse } from '@/lib/types/database.types'
 
 interface UseTradeReturn {
@@ -36,6 +37,13 @@ export function useTrade(): UseTradeReturn {
     amount: number
   ): Promise<BuySharesResponse | null> => {
     try {
+      // Rate limit check
+      const rateLimitResult = checkRateLimit(marketId, 'trade')
+      if (!rateLimitResult.allowed) {
+        setError(formatRateLimitError(rateLimitResult.resetIn))
+        return null
+      }
+
       setIsLoading(true)
       setError(null)
 
@@ -66,6 +74,13 @@ export function useTrade(): UseTradeReturn {
     shares: number
   ): Promise<SellSharesResponse | null> => {
     try {
+      // Rate limit check
+      const rateLimitResult = checkRateLimit(marketId, 'trade')
+      if (!rateLimitResult.allowed) {
+        setError(formatRateLimitError(rateLimitResult.resetIn))
+        return null
+      }
+
       setIsLoading(true)
       setError(null)
 
@@ -95,6 +110,13 @@ export function useTrade(): UseTradeReturn {
     amount: number
   ): Promise<DepositResponse | null> => {
     try {
+      // Rate limit check
+      const rateLimitResult = checkRateLimit(userId, 'deposit')
+      if (!rateLimitResult.allowed) {
+        setError(formatRateLimitError(rateLimitResult.resetIn))
+        return null
+      }
+
       setIsLoading(true)
       setError(null)
 
