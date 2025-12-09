@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import Link from 'next/link'
 import {
   TrendingUp,
   Zap,
@@ -14,12 +15,19 @@ import {
   Tv,
   Cpu,
   Globe,
-  MoreHorizontal
+  MoreHorizontal,
+  Activity,
+  ArrowRight,
+  ChevronRight,
+  Target,
+  LineChart
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { MarketList } from '@/components/markets/MarketList'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { MarketCard } from '@/components/markets/MarketCard'
 import { MarketSearch } from '@/components/markets/MarketSearch'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useMarkets } from '@/lib/hooks'
 import { cn } from '@/lib/utils'
 import { formatBRL } from '@/lib/utils/format'
@@ -55,6 +63,23 @@ export default function HomePage() {
   // Calculate stats
   const totalVolume = markets.reduce((sum, m) => sum + m.total_liquidity, 0)
   const activeMarkets = markets.filter(m => m.outcome === null).length
+  const totalTraders = Math.floor(totalVolume / 50) // Estimate
+
+  // Get featured markets (highest volume)
+  const featuredMarkets = useMemo(() => {
+    return [...markets]
+      .filter(m => m.outcome === null)
+      .sort((a, b) => b.total_liquidity - a.total_liquidity)
+      .slice(0, 2)
+  }, [markets])
+
+  // Get trending markets
+  const trendingMarkets = useMemo(() => {
+    return [...markets]
+      .filter(m => m.outcome === null && m.total_liquidity > 1000)
+      .sort((a, b) => b.total_liquidity - a.total_liquidity)
+      .slice(0, 4)
+  }, [markets])
 
   // Filter markets based on category, special filters, and search query
   const filteredMarkets = useMemo(() => {
@@ -92,63 +117,118 @@ export default function HomePage() {
   }, [markets, searchQuery, activeCategory, specialFilter])
 
   return (
-    <div className="space-y-10">
-      {/* Hero Section */}
-      <section className="relative py-12 md:py-16 bg-hero-pattern rounded-2xl">
-        <div className="max-w-3xl mx-auto text-center space-y-6 px-4">
-          <Badge variant="secondary" className="mb-4 gap-1.5 px-3 py-1 bg-emerald-500/10 text-emerald-500 border-emerald-500/20">
-            <Zap className="w-3 h-3" />
-            Mercado de Teses Brasileiro
-          </Badge>
-
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-            Dados, não apostas.{' '}
-            <span className="text-emerald-500">
-              Teses.
-            </span>
-          </h1>
-
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Plataforma profissional de análise preditiva para política, economia e mercados.
-            Negocie teses com precisão institucional.
-          </p>
-
-          {/* Stats */}
-          <div className="flex flex-wrap justify-center gap-8 pt-6">
-            <StatCard
-              icon={<BarChart3 className="w-5 h-5 text-emerald-500" />}
-              value={formatBRL(totalVolume)}
-              label="Volume Total"
-            />
-            <StatCard
-              icon={<TrendingUp className="w-5 h-5 text-emerald-500" />}
-              value={activeMarkets.toString()}
-              label="Teses Ativas"
-            />
-            <StatCard
-              icon={<Shield className="w-5 h-5 text-emerald-500" />}
-              value="PIX"
-              label="Depósito Instantâneo"
-            />
-          </div>
+    <div className="space-y-8">
+      {/* Hero Stats Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 py-4 border-b border-border/50">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-sm text-muted-foreground">Mercado ativo</span>
         </div>
-      </section>
+        <div className="flex items-center gap-6 text-sm">
+          <StatItem
+            icon={<Activity className="w-4 h-4 text-emerald-500" />}
+            label="Volume Total"
+            value={formatBRL(totalVolume)}
+          />
+          <div className="w-px h-4 bg-border" />
+          <StatItem
+            icon={<BarChart3 className="w-4 h-4 text-blue-500" />}
+            label="Teses Ativas"
+            value={activeMarkets.toString()}
+          />
+          <div className="w-px h-4 bg-border hidden sm:block" />
+          <StatItem
+            icon={<Target className="w-4 h-4 text-amber-500" />}
+            label="Traders"
+            value={totalTraders.toString()}
+            className="hidden sm:flex"
+          />
+        </div>
+      </div>
 
-      {/* Markets Section */}
+      {/* Featured Section */}
+      {!isLoading && featuredMarkets.length > 0 && !searchQuery && (
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Flame className="w-5 h-5 text-amber-500" />
+              <h2 className="text-lg font-bold">Destaque</h2>
+            </div>
+            <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground gap-1">
+              <Link href="/">
+                Ver todos
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </Button>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            {featuredMarkets.map((market) => (
+              <MarketCard key={market.id} market={market} variant="featured" />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Quick Access - Trending Row */}
+      {!isLoading && trendingMarkets.length > 0 && !searchQuery && (
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-emerald-500" />
+              <h2 className="text-lg font-bold">Mais Negociados</h2>
+            </div>
+          </div>
+
+          <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+            {trendingMarkets.map((market) => (
+              <MarketCard key={market.id} market={market} variant="compact" />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Main Markets Section */}
       <section className="space-y-6">
         {/* Search bar */}
-        <MarketSearch
-          value={searchQuery}
-          onChange={setSearchQuery}
-          className="max-w-md"
-          placeholder="Buscar por nome ou descrição..."
-        />
+        <div className="flex flex-col sm:flex-row gap-4">
+          <MarketSearch
+            value={searchQuery}
+            onChange={setSearchQuery}
+            className="flex-1 max-w-lg"
+            placeholder="Buscar teses..."
+          />
+
+          {/* Special filters */}
+          <div className="flex items-center gap-2">
+            {SPECIAL_FILTERS.map((filter) => {
+              const Icon = filter.icon
+              const isActive = specialFilter === filter.id
+
+              return (
+                <Button
+                  key={filter.id}
+                  variant={isActive ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSpecialFilter(isActive ? null : filter.id)}
+                  className={cn(
+                    'gap-1.5 whitespace-nowrap',
+                    isActive && 'bg-emerald-500 hover:bg-emerald-600'
+                  )}
+                >
+                  <Icon className="w-4 h-4" />
+                  {filter.label}
+                </Button>
+              )
+            })}
+          </div>
+        </div>
 
         {/* Header with filters */}
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-bold">Teses</h2>
+              <h2 className="text-2xl font-bold">Todas as Teses</h2>
               <p className="text-sm text-muted-foreground mt-1">
                 {filteredMarkets.length} {filteredMarkets.length === 1 ? 'tese encontrada' : 'teses encontradas'}
                 {searchQuery && (
@@ -157,35 +237,6 @@ export default function HomePage() {
                   </span>
                 )}
               </p>
-            </div>
-
-            {/* Special filters */}
-            <div className="flex items-center gap-2">
-              {SPECIAL_FILTERS.map((filter) => {
-                const Icon = filter.icon
-                const isActive = specialFilter === filter.id
-
-                return (
-                  <Button
-                    key={filter.id}
-                    variant={isActive ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setSpecialFilter(isActive ? null : filter.id)}
-                    className={cn(
-                      'gap-1.5 whitespace-nowrap transition-smooth',
-                      isActive && 'shadow-md'
-                    )}
-                  >
-                    <Icon className="w-4 h-4" />
-                    {filter.label}
-                    {filter.id === 'trending' && (
-                      <Badge variant="secondary" className="ml-1 px-1.5 py-0 text-[10px] bg-amber-500/20 text-amber-500 border-0">
-                        HOT
-                      </Badge>
-                    )}
-                  </Button>
-                )
-              })}
             </div>
           </div>
 
@@ -201,18 +252,23 @@ export default function HomePage() {
               return (
                 <Button
                   key={category.id}
-                  variant={isActive ? 'secondary' : 'ghost'}
+                  variant={isActive ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setActiveCategory(category.id)}
                   className={cn(
-                    'gap-1.5 whitespace-nowrap transition-smooth',
-                    isActive && 'bg-secondary shadow-sm'
+                    'gap-1.5 whitespace-nowrap',
+                    isActive && 'bg-emerald-500 hover:bg-emerald-600'
                   )}
                 >
                   <Icon className="w-4 h-4" />
                   {category.label}
                   {count > 0 && (
-                    <span className="text-xs text-muted-foreground">({count})</span>
+                    <span className={cn(
+                      'text-xs',
+                      isActive ? 'text-white/70' : 'text-muted-foreground'
+                    )}>
+                      ({count})
+                    </span>
                   )}
                 </Button>
               )
@@ -221,61 +277,138 @@ export default function HomePage() {
         </div>
 
         {/* Market grid */}
-        <MarketList
-          markets={filteredMarkets}
-          isLoading={isLoading}
-          error={error}
-        />
+        {isLoading ? (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <MarketCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : error ? (
+          <Card className="border-destructive/50">
+            <CardContent className="py-12 text-center">
+              <p className="text-destructive">{error}</p>
+            </CardContent>
+          </Card>
+        ) : filteredMarkets.length === 0 ? (
+          <Card className="border-border/50">
+            <CardContent className="py-12 text-center">
+              <BarChart3 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground mb-2">Nenhuma tese encontrada</p>
+              {searchQuery && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSearchQuery('')}
+                >
+                  Limpar busca
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredMarkets.map((market) => (
+              <MarketCard key={market.id} market={market} />
+            ))}
+          </div>
+        )}
       </section>
 
-      {/* How it works */}
-      <section className="py-12 border-t border-border/50" id="como-funciona">
-        <h2 className="text-2xl font-bold text-center mb-3">Como funciona</h2>
-        <p className="text-muted-foreground text-center mb-10 max-w-2xl mx-auto">
-          Negocie teses sobre eventos futuros com a precisão de um trader profissional.
-        </p>
-        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          <HowItWorksCard
-            step={1}
-            title="Analise a tese"
-            description="Explore teses sobre política, economia e mercados. Cada tese representa uma previsão binária."
-          />
-          <HowItWorksCard
-            step={2}
-            title="Posicione-se"
-            description="Compre contratos SIM ou NÃO. O preço reflete a probabilidade implícita do mercado."
-          />
-          <HowItWorksCard
-            step={3}
-            title="Realize o lucro"
-            description="Contratos vencedores valem R$ 1,00. Seu retorno = Contratos x R$ 1,00 - Custo de entrada."
-          />
+      {/* How it works - Minimal */}
+      <section className="py-8 border-t border-border/50" id="como-funciona">
+        <div className="grid md:grid-cols-4 gap-6">
+          <div className="md:col-span-1">
+            <h2 className="text-lg font-bold mb-2">Como funciona</h2>
+            <p className="text-sm text-muted-foreground">
+              Negocie teses com precisão institucional.
+            </p>
+          </div>
+          <div className="md:col-span-3 grid sm:grid-cols-3 gap-4">
+            <HowItWorksStep
+              icon={<Target className="w-5 h-5" />}
+              title="Analise"
+              description="Explore teses sobre eventos futuros"
+            />
+            <HowItWorksStep
+              icon={<LineChart className="w-5 h-5" />}
+              title="Posicione"
+              description="Compre SIM ou NAO pelo preco atual"
+            />
+            <HowItWorksStep
+              icon={<TrendingUp className="w-5 h-5" />}
+              title="Realize"
+              description="Ganhe R$ 1,00 por contrato correto"
+            />
+          </div>
         </div>
       </section>
     </div>
   )
 }
 
-function StatCard({ icon, value, label }: { icon: React.ReactNode, value: string, label: string }) {
+function StatItem({
+  icon,
+  label,
+  value,
+  className
+}: {
+  icon: React.ReactNode
+  label: string
+  value: string
+  className?: string
+}) {
   return (
-    <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-card/50 border border-border/50">
+    <div className={cn('flex items-center gap-2', className)}>
       {icon}
-      <div className="text-left">
-        <p className="font-bold text-lg">{value}</p>
-        <p className="text-xs text-muted-foreground">{label}</p>
+      <div className="flex items-baseline gap-1.5">
+        <span className="font-bold text-foreground">{value}</span>
+        <span className="text-xs text-muted-foreground hidden sm:inline">{label}</span>
       </div>
     </div>
   )
 }
 
-function HowItWorksCard({ step, title, description }: { step: number, title: string, description: string }) {
+function HowItWorksStep({
+  icon,
+  title,
+  description
+}: {
+  icon: React.ReactNode
+  title: string
+  description: string
+}) {
   return (
-    <div className="relative p-6 rounded-xl bg-card border border-border/50 hover:border-primary/30 transition-smooth">
-      <div className="absolute -top-3 left-6 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-sm font-bold text-primary-foreground">
-        {step}
+    <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/30 border border-border/50">
+      <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 flex-shrink-0">
+        {icon}
       </div>
-      <h3 className="font-semibold text-lg mt-2 mb-2">{title}</h3>
-      <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
+      <div>
+        <h3 className="font-semibold text-sm">{title}</h3>
+        <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
+      </div>
     </div>
+  )
+}
+
+function MarketCardSkeleton() {
+  return (
+    <Card className="overflow-hidden border-border/50">
+      <Skeleton className="h-32 w-full" />
+      <div className="p-4 space-y-3">
+        <Skeleton className="h-10 w-full" />
+        <div className="flex justify-between">
+          <Skeleton className="h-12 w-20" />
+          <Skeleton className="h-7 w-16" />
+        </div>
+        <div className="flex gap-2">
+          <Skeleton className="h-9 flex-1" />
+          <Skeleton className="h-9 flex-1" />
+        </div>
+        <div className="flex justify-between pt-2 border-t border-border/50">
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-4 w-16" />
+        </div>
+      </div>
+    </Card>
   )
 }
