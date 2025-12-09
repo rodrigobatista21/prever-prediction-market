@@ -63,10 +63,10 @@ export function TradePanel({
 
   const isDisabled = isLoading || amountNumber < 1 || amountNumber > balance
 
-  // Calculate current price per share
+  // Calculate current price per share (modelo "apostas": mais em SIM = maior prob SIM)
   const currentPrice = outcome
-    ? poolNo / (poolYes + poolNo)
-    : poolYes / (poolYes + poolNo)
+    ? poolYes / (poolYes + poolNo)
+    : poolNo / (poolYes + poolNo)
 
   return (
     <Card className="overflow-hidden border-border/50">
@@ -84,7 +84,7 @@ export function TradePanel({
           <TrendingUp className="w-4 h-4" />
           Sim
           <span className="text-lg font-bold">
-            {Math.round(poolNo / (poolYes + poolNo) * 100)}%
+            {Math.round(poolYes / (poolYes + poolNo) * 100)}%
           </span>
         </button>
         <button
@@ -99,7 +99,7 @@ export function TradePanel({
           <TrendingDown className="w-4 h-4" />
           Não
           <span className="text-lg font-bold">
-            {Math.round(poolYes / (poolYes + poolNo) * 100)}%
+            {Math.round(poolNo / (poolYes + poolNo) * 100)}%
           </span>
         </button>
       </div>

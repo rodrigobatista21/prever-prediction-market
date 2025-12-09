@@ -1,6 +1,7 @@
 'use client'
 
-import { ShieldAlert, ShieldCheck, Loader2, Info } from 'lucide-react'
+import { ShieldAlert, ShieldCheck, Loader2, Info, Receipt } from 'lucide-react'
+import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { CreateMarketForm } from '@/components/admin/CreateMarketForm'
@@ -69,16 +70,29 @@ export default function AdminPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-          <ShieldCheck className="w-6 h-6 text-primary" />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+            <ShieldCheck className="w-6 h-6 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold">Painel Admin</h1>
+            <p className="text-sm text-muted-foreground">
+              Gerencie mercados de previsão
+            </p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-2xl font-bold">Painel Admin</h1>
-          <p className="text-sm text-muted-foreground">
-            Gerencie mercados de previsão
-          </p>
-        </div>
+        <Link href="/admin/pagamentos">
+          <Card className="border-primary/50 bg-primary/5 hover:bg-primary/10 transition-colors cursor-pointer">
+            <CardContent className="p-4 flex items-center gap-3">
+              <Receipt className="w-5 h-5 text-primary" />
+              <div>
+                <p className="font-semibold text-sm">Relatório de Pagamentos</p>
+                <p className="text-xs text-muted-foreground">Ver todos os payouts</p>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
       {/* Info Alert */}

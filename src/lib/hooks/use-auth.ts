@@ -16,6 +16,30 @@ interface UseAuthReturn {
   signOut: () => Promise<void>
 }
 
+// Cache profile in memory and sessionStorage to avoid refetching
+const profileCache = new Map<string, Profile>()
+
+// Try to restore from sessionStorage on module load
+if (typeof window !== 'undefined') {
+  try {
+    const cached = sessionStorage.getItem('profile_cache')
+    if (cached) {
+      const parsed = JSON.parse(cached)
+      Object.entries(parsed).forEach(([k, v]) => profileCache.set(k, v as Profile))
+    }
+  } catch {}
+}
+
+function persistCache() {
+  if (typeof window !== 'undefined') {
+    try {
+      const obj: Record<string, Profile> = {}
+      profileCache.forEach((v, k) => obj[k] = v)
+      sessionStorage.setItem('profile_cache', JSON.stringify(obj))
+    } catch {}
+  }
+}
+
 export function useAuth(): UseAuthReturn {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -26,6 +50,13 @@ export function useAuth(): UseAuthReturn {
   const supabase = createClient()
 
   const fetchProfile = useCallback(async (userId: string) => {
+    // Check cache first
+    const cached = profileCache.get(userId)
+    if (cached) {
+      setProfile(cached)
+      return cached
+    }
+
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -35,12 +66,18 @@ export function useAuth(): UseAuthReturn {
 
       if (error) {
         console.error('useAuth: Error fetching profile', error)
-        return
+        return null
       }
 
-      setProfile(data)
+      if (data) {
+        profileCache.set(userId, data)
+        persistCache()
+        setProfile(data)
+      }
+      return data
     } catch (error) {
       console.error('useAuth: Unexpected error fetching profile', error)
+      return null
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -52,8 +89,8 @@ export function useAuth(): UseAuthReturn {
 
     let mounted = true
 
-    // Get initial session
-    const getSession = async () => {
+    // Get initial session - optimized for speed
+    const initAuth = async () => {
       try {
         const { data: { session: currentSession }, error } = await supabase.auth.getSession()
 
@@ -69,18 +106,26 @@ export function useAuth(): UseAuthReturn {
         setUser(currentSession?.user ?? null)
 
         if (currentSession?.user) {
-          await fetchProfile(currentSession.user.id)
+          // Check cache immediately
+          const cached = profileCache.get(currentSession.user.id)
+          if (cached) {
+            setProfile(cached)
+            setIsLoading(false)
+          } else {
+            // Fetch profile (will set loading to false after)
+            await fetchProfile(currentSession.user.id)
+            if (mounted) setIsLoading(false)
+          }
+        } else {
+          setIsLoading(false)
         }
       } catch (error) {
         console.error('useAuth: Unexpected error', error)
-      } finally {
-        if (mounted) {
-          setIsLoading(false)
-        }
+        if (mounted) setIsLoading(false)
       }
     }
 
-    getSession()
+    initAuth()
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(

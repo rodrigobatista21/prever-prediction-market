@@ -43,10 +43,10 @@ export function useAdmin() {
       const { data, error: rpcError } = await (supabase.rpc as any)('rpc_create_market', {
         p_title: params.title,
         p_description: params.description,
-        p_category: params.category ?? 'outros',
         p_ends_at: params.ends_at,
         p_initial_liquidity: params.initial_liquidity ?? 1000,
         p_image_url: params.image_url ?? null,
+        p_category: params.category ?? 'outros',
       })
 
       if (rpcError) {
