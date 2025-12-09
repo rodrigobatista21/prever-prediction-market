@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { Clock, TrendingUp, TrendingDown, Users, Flame, Landmark, DollarSign, Trophy, Tv, Cpu, Globe, MoreHorizontal, Activity, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Sparkline, generateMockSparklineData } from '@/components/ui/sparkline'
+import { Sparkline } from '@/components/ui/sparkline'
 import type { MarketWithOdds, MarketCategory } from '@/lib/types/database.types'
 import { formatRelativeDate, formatBRL } from '@/lib/utils/format'
 import { cn } from '@/lib/utils'
@@ -25,6 +25,8 @@ interface MarketCardProps {
   market: MarketWithOdds
   className?: string
   variant?: 'default' | 'compact' | 'featured'
+  sparklineData?: number[]
+  change24h?: number
 }
 
 function checkIsEnding(endsAt: string): boolean {
@@ -37,23 +39,35 @@ function checkIsTrending(liquidity: number): boolean {
   return liquidity > 2500
 }
 
-export function MarketCard({ market, className, variant = 'default' }: MarketCardProps) {
+export function MarketCard({ market, className, variant = 'default', sparklineData: propSparklineData, change24h: propChange24h }: MarketCardProps) {
   const isEnding = checkIsEnding(market.ends_at)
   const isTrending = checkIsTrending(market.total_liquidity)
   const categoryConfig = CATEGORY_CONFIG[market.category || 'outros']
   const CategoryIcon = categoryConfig.icon
 
-  // Generate mock sparkline data based on current odds
+  // Use prop data if available, otherwise generate placeholder
   const sparklineData = useMemo(() => {
-    return generateMockSparklineData(market.odds_yes, 12)
-  }, [market.odds_yes])
+    if (propSparklineData && propSparklineData.length > 0) {
+      return propSparklineData
+    }
+    // Fallback: simple line at current odds if no real data
+    return [market.odds_yes, market.odds_yes]
+  }, [propSparklineData, market.odds_yes])
 
-  // Calculate mock 24h change
+  // Use prop change or calculate from sparkline
   const change24h = useMemo(() => {
-    const first = sparklineData[0]
-    const last = sparklineData[sparklineData.length - 1]
-    return ((last - first) / first) * 100
-  }, [sparklineData])
+    if (propChange24h !== undefined) {
+      return propChange24h
+    }
+    if (sparklineData.length >= 2) {
+      const first = sparklineData[0]
+      const last = sparklineData[sparklineData.length - 1]
+      if (first > 0) {
+        return ((last - first) / first) * 100
+      }
+    }
+    return 0
+  }, [propChange24h, sparklineData])
 
   // Featured variant - Large card for hero section
   if (variant === 'featured') {

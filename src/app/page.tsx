@@ -28,7 +28,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { MarketCard } from '@/components/markets/MarketCard'
 import { MarketSearch } from '@/components/markets/MarketSearch'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useMarkets } from '@/lib/hooks'
+import { useMarkets, useMultipleOddsHistory, getSparklineData, calculate24hChange } from '@/lib/hooks'
 import { cn } from '@/lib/utils'
 import { formatBRL } from '@/lib/utils/format'
 import type { MarketCategory } from '@/lib/types/database.types'
@@ -59,6 +59,24 @@ export default function HomePage() {
   const [activeCategory, setActiveCategory] = useState<ThemeCategoryId>('all')
   const [specialFilter, setSpecialFilter] = useState<SpecialFilterId>(null)
   const [searchQuery, setSearchQuery] = useState('')
+
+  // Fetch odds history for all markets
+  const marketIds = useMemo(() => markets.map(m => m.id), [markets])
+  const oddsHistoryMap = useMultipleOddsHistory(marketIds)
+
+  // Helper to get sparkline data for a market
+  const getMarketSparkline = (marketId: string) => {
+    const history = oddsHistoryMap.get(marketId)
+    if (!history || history.length === 0) return undefined
+    return getSparklineData(history, 12)
+  }
+
+  // Helper to get 24h change for a market
+  const getMarketChange24h = (marketId: string) => {
+    const history = oddsHistoryMap.get(marketId)
+    if (!history || history.length === 0) return undefined
+    return calculate24hChange(history)
+  }
 
   // Calculate stats
   const totalVolume = markets.reduce((sum, m) => sum + m.total_liquidity, 0)
@@ -118,8 +136,35 @@ export default function HomePage() {
 
   return (
     <div className="space-y-8">
-      {/* Hero Stats Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 py-4 border-b border-border/50">
+      {/* Hero Section */}
+      <section className="py-8 md:py-12">
+        <div className="max-w-3xl">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4">
+            Dados, nao apostas.{' '}
+            <span className="text-emerald-500">Teses.</span>
+          </h1>
+          <p className="text-lg md:text-xl text-muted-foreground mb-6 max-w-2xl">
+            Plataforma profissional de analise preditiva para politica, economia e mercados.
+            Negocie teses com precisao institucional.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Button size="lg" className="bg-emerald-500 hover:bg-emerald-600 gap-2" asChild>
+              <Link href="#todas-teses">
+                Explorar Teses
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </Button>
+            <Button size="lg" variant="outline" asChild>
+              <Link href="#como-funciona">
+                Como funciona
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 py-4 border-y border-border/50">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span className="text-sm text-muted-foreground">Mercado ativo</span>
@@ -164,7 +209,13 @@ export default function HomePage() {
 
           <div className="grid gap-4 md:grid-cols-2">
             {featuredMarkets.map((market) => (
-              <MarketCard key={market.id} market={market} variant="featured" />
+              <MarketCard
+                key={market.id}
+                market={market}
+                variant="featured"
+                sparklineData={getMarketSparkline(market.id)}
+                change24h={getMarketChange24h(market.id)}
+              />
             ))}
           </div>
         </section>
@@ -182,14 +233,20 @@ export default function HomePage() {
 
           <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
             {trendingMarkets.map((market) => (
-              <MarketCard key={market.id} market={market} variant="compact" />
+              <MarketCard
+                key={market.id}
+                market={market}
+                variant="compact"
+                sparklineData={getMarketSparkline(market.id)}
+                change24h={getMarketChange24h(market.id)}
+              />
             ))}
           </div>
         </section>
       )}
 
       {/* Main Markets Section */}
-      <section className="space-y-6">
+      <section className="space-y-6" id="todas-teses">
         {/* Search bar */}
         <div className="flex flex-col sm:flex-row gap-4">
           <MarketSearch
@@ -308,7 +365,12 @@ export default function HomePage() {
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {filteredMarkets.map((market) => (
-              <MarketCard key={market.id} market={market} />
+              <MarketCard
+                key={market.id}
+                market={market}
+                sparklineData={getMarketSparkline(market.id)}
+                change24h={getMarketChange24h(market.id)}
+              />
             ))}
           </div>
         )}
