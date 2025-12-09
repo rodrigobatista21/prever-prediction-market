@@ -17,33 +17,35 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Prever - Prediction Market Brasileiro",
-    template: "%s | Prever",
+    default: "TesePro - Mercado de Teses Brasileiro",
+    template: "%s | TesePro",
   },
   description:
-    "Aposte em eventos de política, economia e esportes. Sem crypto, sem complicação. Igual Betano, mas para previsões.",
+    "Plataforma profissional de análise preditiva. Negocie teses sobre política, economia e mercados. Dados, não apostas.",
   keywords: [
     "prediction market",
-    "apostas",
+    "análise preditiva",
     "brasil",
     "política",
     "economia",
-    "previsões",
+    "teses",
+    "mercado financeiro",
+    "trading",
   ],
-  authors: [{ name: "Prever" }],
-  creator: "Prever",
+  authors: [{ name: "TesePro" }],
+  creator: "TesePro",
   openGraph: {
     type: "website",
     locale: "pt_BR",
-    url: "https://prever.com.br",
-    siteName: "Prever",
-    title: "Prever - Prediction Market Brasileiro",
-    description: "Aposte em eventos de política, economia e esportes.",
+    url: "https://tesepro.com.br",
+    siteName: "TesePro",
+    title: "TesePro - Mercado de Teses Brasileiro",
+    description: "Plataforma profissional de análise preditiva para traders e analistas.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Prever - Prediction Market Brasileiro",
-    description: "Aposte em eventos de política, economia e esportes.",
+    title: "TesePro - Mercado de Teses Brasileiro",
+    description: "Plataforma profissional de análise preditiva para traders e analistas.",
   },
 };
 

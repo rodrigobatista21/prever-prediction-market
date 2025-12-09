@@ -192,10 +192,10 @@ export default function MinhasApostasPage() {
             <BarChart3 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground mb-2">Você ainda não tem posições</p>
             <p className="text-sm text-muted-foreground mb-4">
-              Explore os mercados e faça sua primeira aposta
+              Explore as teses e faça sua primeira operação
             </p>
             <Button asChild>
-              <Link href="/">Ver Mercados</Link>
+              <Link href="/">Ver Teses</Link>
             </Button>
           </CardContent>
         </Card>

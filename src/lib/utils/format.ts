@@ -1,5 +1,5 @@
 /**
- * Utilitários de formatação para o Prever
+ * Utilitários de formatação para o TesePro
  * Padrão brasileiro: pt-BR, BRL
  */
 

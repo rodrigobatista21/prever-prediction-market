@@ -44,7 +44,7 @@ export function MarketTradeHistory({ marketId, className }: MarketTradeHistoryPr
         </CardHeader>
         <CardContent>
           <p className="text-center text-sm text-muted-foreground py-6">
-            Nenhuma aposta ainda. Seja o primeiro!
+            Nenhuma operação ainda. Seja o primeiro!
           </p>
         </CardContent>
       </Card>
@@ -58,7 +58,7 @@ export function MarketTradeHistory({ marketId, className }: MarketTradeHistoryPr
           <Activity className="w-4 h-4 text-primary" />
           Atividade Recente
           <span className="text-xs font-normal text-muted-foreground">
-            ({trades.length} apostas)
+            ({trades.length} operações)
           </span>
         </CardTitle>
       </CardHeader>
@@ -69,7 +69,7 @@ export function MarketTradeHistory({ marketId, className }: MarketTradeHistoryPr
 
         {trades.length > 10 && (
           <p className="text-xs text-center text-muted-foreground pt-2">
-            +{trades.length - 10} apostas anteriores
+            +{trades.length - 10} operações anteriores
           </p>
         )}
       </CardContent>
@@ -104,7 +104,7 @@ function TradeItem({ trade }: { trade: MarketTrade }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 text-sm">
           <span className="font-medium truncate">{displayName}</span>
-          <span className="text-muted-foreground">apostou</span>
+          <span className="text-muted-foreground">comprou</span>
           <span className="font-semibold">{formatBRL(trade.amount)}</span>
           <span className="text-muted-foreground">em</span>
           <span className={cn(

@@ -84,9 +84,9 @@ export default function RegisterPage() {
               <TrendingUp className="w-6 h-6 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-2xl">Criar conta no Prever</CardTitle>
+          <CardTitle className="text-2xl">Criar conta no TesePro</CardTitle>
           <CardDescription>
-            Comece a apostar em eventos do Brasil
+            Comece a negociar teses sobre o Brasil
           </CardDescription>
         </CardHeader>
 

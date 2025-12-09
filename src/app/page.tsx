@@ -96,37 +96,37 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="relative py-12 md:py-16 bg-hero-pattern rounded-2xl">
         <div className="max-w-3xl mx-auto text-center space-y-6 px-4">
-          <Badge variant="secondary" className="mb-4 gap-1.5 px-3 py-1">
-            <Zap className="w-3 h-3 text-amber-500" />
-            Beta - Mercado de Previsões do Brasil
+          <Badge variant="secondary" className="mb-4 gap-1.5 px-3 py-1 bg-emerald-500/10 text-emerald-500 border-emerald-500/20">
+            <Zap className="w-3 h-3" />
+            Mercado de Teses Brasileiro
           </Badge>
 
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-            Aposte no futuro do{' '}
-            <span className="text-primary bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
-              Brasil
+            Dados, não apostas.{' '}
+            <span className="text-emerald-500">
+              Teses.
             </span>
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Prediction market para política, economia e eventos.
-            Compre ações de SIM ou NÃO e lucre se acertar o resultado.
+            Plataforma profissional de análise preditiva para política, economia e mercados.
+            Negocie teses com precisão institucional.
           </p>
 
           {/* Stats */}
           <div className="flex flex-wrap justify-center gap-8 pt-6">
             <StatCard
-              icon={<BarChart3 className="w-5 h-5 text-primary" />}
+              icon={<BarChart3 className="w-5 h-5 text-emerald-500" />}
               value={formatBRL(totalVolume)}
               label="Volume Total"
             />
             <StatCard
               icon={<TrendingUp className="w-5 h-5 text-emerald-500" />}
               value={activeMarkets.toString()}
-              label="Mercados Ativos"
+              label="Teses Ativas"
             />
             <StatCard
-              icon={<Shield className="w-5 h-5 text-amber-500" />}
+              icon={<Shield className="w-5 h-5 text-emerald-500" />}
               value="PIX"
               label="Depósito Instantâneo"
             />
@@ -148,9 +148,9 @@ export default function HomePage() {
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-bold">Mercados</h2>
+              <h2 className="text-2xl font-bold">Teses</h2>
               <p className="text-sm text-muted-foreground mt-1">
-                {filteredMarkets.length} {filteredMarkets.length === 1 ? 'mercado encontrado' : 'mercados encontrados'}
+                {filteredMarkets.length} {filteredMarkets.length === 1 ? 'tese encontrada' : 'teses encontradas'}
                 {searchQuery && (
                   <span className="ml-1">
                     para &quot;{searchQuery}&quot;
@@ -230,22 +230,25 @@ export default function HomePage() {
 
       {/* How it works */}
       <section className="py-12 border-t border-border/50" id="como-funciona">
-        <h2 className="text-2xl font-bold text-center mb-10">Como funciona</h2>
+        <h2 className="text-2xl font-bold text-center mb-3">Como funciona</h2>
+        <p className="text-muted-foreground text-center mb-10 max-w-2xl mx-auto">
+          Negocie teses sobre eventos futuros com a precisão de um trader profissional.
+        </p>
         <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           <HowItWorksCard
             step={1}
-            title="Escolha um mercado"
-            description="Navegue pelos mercados disponíveis e escolha um evento que você quer prever."
+            title="Analise a tese"
+            description="Explore teses sobre política, economia e mercados. Cada tese representa uma previsão binária."
           />
           <HowItWorksCard
             step={2}
-            title="Compre SIM ou NÃO"
-            description="Aposte no resultado que você acredita. O preço reflete a probabilidade atual."
+            title="Posicione-se"
+            description="Compre contratos SIM ou NÃO. O preço reflete a probabilidade implícita do mercado."
           />
           <HowItWorksCard
             step={3}
-            title="Receba se acertar"
-            description="Se sua previsão estiver correta, cada ação vale R$ 1,00. Lucro = Ações - Custo."
+            title="Realize o lucro"
+            description="Contratos vencedores valem R$ 1,00. Seu retorno = Contratos x R$ 1,00 - Custo de entrada."
           />
         </div>
       </section>

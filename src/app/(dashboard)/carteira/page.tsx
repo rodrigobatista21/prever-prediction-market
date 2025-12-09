@@ -98,7 +98,7 @@ export default function CarteiraPage() {
               <Wallet className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground">Nenhuma transação ainda</p>
               <p className="text-sm text-muted-foreground">
-                Faça um depósito para começar a apostar
+                Faça um depósito para começar a operar
               </p>
             </div>
           ) : (

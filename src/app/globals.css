@@ -48,82 +48,82 @@
   --color-no-foreground: var(--no-foreground);
 }
 
-/* Dark mode by default - Polymarket style */
+/* Dark Mode Institucional - Bloomberg / Faria Lima style */
 :root {
-  --radius: 0.75rem;
-  /* Dark theme - inspired by Polymarket */
-  --background: #0d0d0d;
-  --foreground: #f2f2f2;
-  --card: #171717;
-  --card-foreground: #f2f2f2;
-  --popover: #1a1a1a;
-  --popover-foreground: #f2f2f2;
-  --primary: #1652f0;
+  --radius: 0.625rem;
+  /* TesePro Dark Theme - Institutional Trading Platform */
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #0f0f12;
+  --card-foreground: #fafafa;
+  --popover: #111114;
+  --popover-foreground: #fafafa;
+  --primary: #10b981;
   --primary-foreground: #ffffff;
-  --secondary: #262626;
-  --secondary-foreground: #f2f2f2;
-  --muted: #1f1f1f;
-  --muted-foreground: #a3a3a3;
-  --accent: #262626;
-  --accent-foreground: #f2f2f2;
-  --destructive: #ef4444;
-  --border: #2a2a2a;
-  --input: #262626;
-  --ring: #1652f0;
-  /* Trading colors */
-  --yes: #22c55e;
+  --secondary: #18181b;
+  --secondary-foreground: #fafafa;
+  --muted: #18181b;
+  --muted-foreground: #71717a;
+  --accent: #1c1c21;
+  --accent-foreground: #fafafa;
+  --destructive: #dc2626;
+  --border: #27272a;
+  --input: #1c1c21;
+  --ring: #10b981;
+  /* Trading colors - Professional */
+  --yes: #10b981;
   --yes-foreground: #ffffff;
   --no: #ef4444;
   --no-foreground: #ffffff;
-  /* Charts */
-  --chart-1: #1652f0;
-  --chart-2: #22c55e;
+  /* Charts - Institutional palette */
+  --chart-1: #10b981;
+  --chart-2: #3b82f6;
   --chart-3: #f59e0b;
   --chart-4: #8b5cf6;
   --chart-5: #ec4899;
   /* Sidebar */
-  --sidebar: #0d0d0d;
-  --sidebar-foreground: #f2f2f2;
-  --sidebar-primary: #1652f0;
+  --sidebar: #09090b;
+  --sidebar-foreground: #fafafa;
+  --sidebar-primary: #10b981;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1f1f1f;
-  --sidebar-accent-foreground: #f2f2f2;
-  --sidebar-border: #2a2a2a;
-  --sidebar-ring: #1652f0;
+  --sidebar-accent: #18181b;
+  --sidebar-accent-foreground: #fafafa;
+  --sidebar-border: #27272a;
+  --sidebar-ring: #10b981;
 }
 
-/* Light mode option */
+/* Light mode option - Professional */
 .light {
-  --background: #ffffff;
-  --foreground: #0d0d0d;
+  --background: #fafafa;
+  --foreground: #09090b;
   --card: #ffffff;
-  --card-foreground: #0d0d0d;
+  --card-foreground: #09090b;
   --popover: #ffffff;
-  --popover-foreground: #0d0d0d;
-  --primary: #1652f0;
+  --popover-foreground: #09090b;
+  --primary: #059669;
   --primary-foreground: #ffffff;
-  --secondary: #f5f5f5;
-  --secondary-foreground: #0d0d0d;
-  --muted: #f5f5f5;
-  --muted-foreground: #737373;
-  --accent: #f5f5f5;
-  --accent-foreground: #0d0d0d;
-  --destructive: #ef4444;
-  --border: #e5e5e5;
-  --input: #e5e5e5;
-  --ring: #1652f0;
-  --yes: #22c55e;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #09090b;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --accent: #f4f4f5;
+  --accent-foreground: #09090b;
+  --destructive: #dc2626;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #059669;
+  --yes: #10b981;
   --yes-foreground: #ffffff;
   --no: #ef4444;
   --no-foreground: #ffffff;
   --sidebar: #fafafa;
-  --sidebar-foreground: #0d0d0d;
-  --sidebar-primary: #1652f0;
+  --sidebar-foreground: #09090b;
+  --sidebar-primary: #059669;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f5f5f5;
-  --sidebar-accent-foreground: #0d0d0d;
-  --sidebar-border: #e5e5e5;
-  --sidebar-ring: #1652f0;
+  --sidebar-accent: #f4f4f5;
+  --sidebar-accent-foreground: #09090b;
+  --sidebar-border: #e4e4e7;
+  --sidebar-ring: #059669;
 }
 
 @layer base {
@@ -184,15 +184,15 @@
   }
 }
 
-/* Gradient backgrounds */
+/* Gradient backgrounds - Institutional */
 @layer utilities {
   .bg-gradient-radial {
     background: radial-gradient(ellipse at top, var(--tw-gradient-from) 0%, var(--tw-gradient-to) 100%);
   }
   .bg-hero-pattern {
     background-image:
-      radial-gradient(at 40% 20%, rgba(22, 82, 240, 0.15) 0px, transparent 50%),
-      radial-gradient(at 80% 0%, rgba(34, 197, 94, 0.1) 0px, transparent 50%),
-      radial-gradient(at 0% 50%, rgba(139, 92, 246, 0.1) 0px, transparent 50%);
+      radial-gradient(at 40% 20%, rgba(16, 185, 129, 0.12) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, rgba(16, 185, 129, 0.06) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, rgba(16, 185, 129, 0.04) 0px, transparent 50%);
   }
 }

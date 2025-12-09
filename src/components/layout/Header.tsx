@@ -39,11 +39,14 @@ export function Header() {
       <div className="container flex h-16 items-center justify-between">
         {/* Logo & Nav */}
         <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2.5 font-bold text-xl group">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center group-hover:scale-105 transition-transform">
-              <TrendingUp className="w-4 h-4 text-primary-foreground" />
+          <Link href="/" className="flex items-center gap-2 font-bold text-xl group">
+            <div className="w-8 h-8 rounded bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg shadow-emerald-500/20">
+              <TrendingUp className="w-4 h-4 text-white" />
             </div>
-            <span className="hidden sm:inline">Prever</span>
+            <span className="hidden sm:inline tracking-tight">
+              <span className="text-foreground">Tese</span>
+              <span className="text-emerald-500">Pro</span>
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -161,8 +164,8 @@ export function Header() {
             <SheetContent side="right" className="w-[280px]">
               <SheetHeader>
                 <SheetTitle className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-primary" />
-                  Prever
+                  <TrendingUp className="w-5 h-5 text-emerald-500" />
+                  <span>Tese<span className="text-emerald-500">Pro</span></span>
                 </SheetTitle>
               </SheetHeader>
               <nav className="flex flex-col gap-2 mt-6">

@@ -276,7 +276,7 @@ export default function MarketPage({ params }: MarketPageProps) {
                         <Users className="w-7 h-7 text-primary" />
                       </div>
                       <div>
-                        <p className="font-semibold mb-1">Entre para apostar</p>
+                        <p className="font-semibold mb-1">Entre para operar</p>
                         <p className="text-sm text-muted-foreground">
                           Faça login para participar deste mercado
                         </p>

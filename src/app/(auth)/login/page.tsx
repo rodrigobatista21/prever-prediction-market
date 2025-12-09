@@ -60,9 +60,9 @@ function LoginForm() {
               <TrendingUp className="w-6 h-6 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-2xl">Entrar no Prever</CardTitle>
+          <CardTitle className="text-2xl">Entrar no TesePro</CardTitle>
           <CardDescription>
-            Acesse sua conta para começar a apostar
+            Acesse sua conta para negociar teses
           </CardDescription>
         </CardHeader>
 
