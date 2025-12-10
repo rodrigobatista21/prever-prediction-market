@@ -178,6 +178,138 @@ export interface Database {
         }
         Update: never // Audit logs são imutáveis
       }
+      orders: {
+        Row: {
+          id: string
+          market_id: string
+          user_id: string
+          outcome: boolean
+          side: string
+          order_type: string
+          price: number | null
+          quantity: number
+          filled_quantity: number
+          avg_fill_price: number | null
+          status: string
+          is_platform_order: boolean
+          expires_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          market_id: string
+          user_id: string
+          outcome: boolean
+          side: string
+          order_type?: string
+          price?: number | null
+          quantity: number
+          filled_quantity?: number
+          avg_fill_price?: number | null
+          status?: string
+          is_platform_order?: boolean
+          expires_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          market_id?: string
+          user_id?: string
+          outcome?: boolean
+          side?: string
+          order_type?: string
+          price?: number | null
+          quantity?: number
+          filled_quantity?: number
+          avg_fill_price?: number | null
+          status?: string
+          is_platform_order?: boolean
+          expires_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      order_fills: {
+        Row: {
+          id: string
+          market_id: string
+          buy_order_id: string
+          sell_order_id: string
+          buyer_id: string
+          seller_id: string
+          outcome: boolean
+          price: number
+          quantity: number
+          buyer_fee: number
+          seller_fee: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          market_id: string
+          buy_order_id: string
+          sell_order_id: string
+          buyer_id: string
+          seller_id: string
+          outcome: boolean
+          price: number
+          quantity: number
+          buyer_fee?: number
+          seller_fee?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          market_id?: string
+          buy_order_id?: string
+          sell_order_id?: string
+          buyer_id?: string
+          seller_id?: string
+          outcome?: boolean
+          price?: number
+          quantity?: number
+          buyer_fee?: number
+          seller_fee?: number
+          created_at?: string
+        }
+      }
+      user_shares: {
+        Row: {
+          id: string
+          user_id: string
+          market_id: string
+          outcome: boolean
+          quantity: number
+          avg_cost: number | null
+          realized_pnl: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          market_id: string
+          outcome: boolean
+          quantity?: number
+          avg_cost?: number | null
+          realized_pnl?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          market_id?: string
+          outcome?: boolean
+          quantity?: number
+          avg_cost?: number | null
+          realized_pnl?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Functions: {
       rpc_deposit_mock: {
@@ -235,6 +367,84 @@ export interface Database {
           price_yes: number
           price_no: number
           total_liquidity: number
+        }[]
+      }
+      place_order: {
+        Args: {
+          p_user_id: string
+          p_market_id: string
+          p_outcome: boolean
+          p_side: string
+          p_order_type: string
+          p_price: number | null
+          p_quantity: number
+        }
+        Returns: Json
+      }
+      cancel_order: {
+        Args: {
+          p_user_id: string
+          p_order_id: string
+        }
+        Returns: Json
+      }
+      get_order_book_detailed: {
+        Args: {
+          p_market_id: string
+          p_outcome: boolean
+          p_depth?: number
+        }
+        Returns: {
+          side: string
+          price: number
+          quantity: number
+          cumulative_quantity: number
+          order_count: number
+        }[]
+      }
+      get_best_prices: {
+        Args: {
+          p_market_id: string
+          p_outcome: boolean
+        }
+        Returns: {
+          best_bid: number | null
+          best_ask: number | null
+          bid_quantity: number | null
+          ask_quantity: number | null
+        }[]
+      }
+      get_user_open_orders: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: {
+          id: string
+          market_id: string
+          market_title: string
+          outcome: boolean
+          side: string
+          order_type: string
+          price: number
+          quantity: number
+          filled_quantity: number
+          status: string
+          created_at: string
+        }[]
+      }
+      get_user_positions: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: {
+          market_id: string
+          market_title: string
+          market_status: string
+          outcome: boolean
+          quantity: number
+          avg_cost: number | null
+          current_value: number
+          unrealized_pnl: number
         }[]
       }
     }
