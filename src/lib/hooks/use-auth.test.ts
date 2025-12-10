@@ -181,10 +181,10 @@ describe('useAuth', () => {
   })
 
   describe('signInWithGoogle', () => {
-    it('should initiate Google OAuth', async () => {
-      // Mock window.location.origin
+    it('should initiate Google OAuth with localhost redirect in dev', async () => {
+      // Mock window.location for localhost (development)
       Object.defineProperty(window, 'location', {
-        value: { origin: 'http://localhost:3000' },
+        value: { origin: 'http://localhost:3000', hostname: 'localhost' },
         writable: true,
       })
 
@@ -204,6 +204,31 @@ describe('useAuth', () => {
         provider: 'google',
         options: {
           redirectTo: 'http://localhost:3000/auth/callback',
+        },
+      })
+    })
+
+    it('should initiate Google OAuth with production redirect when not localhost', async () => {
+      // Mock window.location for production
+      Object.defineProperty(window, 'location', {
+        value: { origin: 'https://tesepro.com.br', hostname: 'tesepro.com.br' },
+        writable: true,
+      })
+
+      const { result } = renderHook(() => useAuth())
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false)
+      })
+
+      await act(async () => {
+        await result.current.signInWithGoogle()
+      })
+
+      expect(mockSupabase.auth.signInWithOAuth).toHaveBeenCalledWith({
+        provider: 'google',
+        options: {
+          redirectTo: 'https://tesepro.com.br/auth/callback',
         },
       })
     })

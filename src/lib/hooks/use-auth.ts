@@ -173,14 +173,21 @@ export function useAuth(): UseAuthReturn {
   }, [supabase])
 
   const signInWithGoogle = useCallback(async () => {
-    // Use NEXT_PUBLIC_SITE_URL for production, fallback to window.location.origin
-    // This ensures OAuth redirects work correctly even if there's cached state from localhost
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
+    // Get the correct redirect URL based on environment
+    // In production, always use tesepro.com.br to avoid cached localhost redirects
+    const getRedirectUrl = () => {
+      // Check if we're in production (not localhost)
+      if (typeof window !== 'undefined' && !window.location.hostname.includes('localhost')) {
+        return 'https://tesepro.com.br/auth/callback'
+      }
+      // For local development, use the current origin
+      return `${window.location.origin}/auth/callback`
+    }
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${siteUrl}/auth/callback`,
+        redirectTo: getRedirectUrl(),
       },
     })
     return { error: error as Error | null }
