@@ -58,7 +58,7 @@ export default function AdminPage() {
             <pre className="mt-2 p-2 bg-muted rounded text-xs overflow-x-auto">
               UPDATE profiles{'\n'}
               SET is_admin = true{'\n'}
-              WHERE id = '{user.id}';
+              WHERE id = &apos;{user.id}&apos;;
             </pre>
           </CardContent>
         </Card>
@@ -102,7 +102,7 @@ export default function AdminPage() {
         <AlertDescription className="text-sm space-y-1">
           <p>1. Crie um mercado de teste abaixo</p>
           <p>2. Faça apostas como usuário normal (use outra conta ou aba anônima)</p>
-          <p>3. Resolva o mercado clicando em "Resolver SIM" ou "Resolver NÃO"</p>
+          <p>3. Resolva o mercado clicando em &quot;Resolver SIM&quot; ou &quot;Resolver NÃO&quot;</p>
           <p>4. Verifique se o saldo do usuário vencedor aumentou</p>
         </AlertDescription>
       </Alert>

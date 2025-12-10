@@ -61,7 +61,6 @@ export function OddsChart({ marketId, className }: OddsChartProps) {
         .limit(100)
 
       if (fetchError) {
-        console.error('Error fetching odds history:', fetchError)
         setError('Erro ao carregar histórico')
         setIsLoading(false)
         return

@@ -71,8 +71,6 @@ export function useAdmin() {
     setIsLoading(true)
     setError(null)
 
-    console.log('useAdmin: Resolving market', { marketId, winningOutcome })
-
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error: rpcError } = await (supabase.rpc as any)('rpc_resolve_market', {
@@ -80,17 +78,13 @@ export function useAdmin() {
         p_winning_outcome: winningOutcome,
       })
 
-      console.log('useAdmin: RPC response', { data, error: rpcError })
-
       if (rpcError) {
-        console.error('useAdmin: RPC error', rpcError)
         setError(rpcError.message)
         return null
       }
 
       return data as ResolveMarketResponse
     } catch (err) {
-      console.error('useAdmin: Unexpected error', err)
       const message = err instanceof Error ? err.message : 'Erro ao resolver mercado'
       setError(message)
       return null

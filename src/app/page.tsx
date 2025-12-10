@@ -1,11 +1,9 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import {
   TrendingUp,
-  Zap,
-  Shield,
   BarChart3,
   Flame,
   Clock,
@@ -23,15 +21,13 @@ import {
   LineChart
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { MarketCard } from '@/components/markets/MarketCard'
 import { MarketSearch } from '@/components/markets/MarketSearch'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useMarkets, useMultipleOddsHistory, getSparklineData, calculate24hChange } from '@/lib/hooks'
 import { cn } from '@/lib/utils'
 import { formatBRL } from '@/lib/utils/format'
-import type { MarketCategory } from '@/lib/types/database.types'
 
 // Categorias temáticas
 const THEME_CATEGORIES = [
@@ -59,6 +55,13 @@ export default function HomePage() {
   const [activeCategory, setActiveCategory] = useState<ThemeCategoryId>('all')
   const [specialFilter, setSpecialFilter] = useState<SpecialFilterId>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [now, setNow] = useState(() => Date.now())
+
+  // Update timestamp periodically for time-based filters
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 60000) // Update every minute
+    return () => clearInterval(interval)
+  }, [])
 
   // Fetch odds history for all markets
   const marketIds = useMemo(() => markets.map(m => m.id), [markets])
@@ -100,6 +103,7 @@ export default function HomePage() {
   }, [markets])
 
   // Filter markets based on category, special filters, and search query
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const filteredMarkets = useMemo(() => {
     const query = searchQuery.toLowerCase().trim()
 
@@ -125,14 +129,14 @@ export default function HomePage() {
       if (specialFilter === 'ending') {
         const endsAt = new Date(market.ends_at).getTime()
         const threeDays = 3 * 24 * 60 * 60 * 1000
-        if (endsAt - Date.now() >= threeDays) {
+        if (endsAt - now >= threeDays) {
           return false
         }
       }
 
       return true
     })
-  }, [markets, searchQuery, activeCategory, specialFilter])
+  }, [markets, searchQuery, activeCategory, specialFilter, now])
 
   return (
     <div className="space-y-8">

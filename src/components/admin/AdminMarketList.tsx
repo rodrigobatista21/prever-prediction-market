@@ -8,7 +8,6 @@ import {
   AlertTriangle,
   Clock,
   TrendingUp,
-  Users,
   RefreshCw
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'

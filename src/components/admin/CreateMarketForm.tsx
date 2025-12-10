@@ -102,7 +102,6 @@ export function CreateMarketForm({ onSuccess }: CreateMarketFormProps) {
       })
 
     if (error) {
-      console.error('Upload error:', error)
       throw new Error('Erro ao fazer upload da imagem')
     }
 
@@ -141,7 +140,7 @@ export function CreateMarketForm({ onSuccess }: CreateMarketFormProps) {
       try {
         finalImageUrl = await uploadImage(imageFile)
         toast.success('Imagem enviada!')
-      } catch (err) {
+      } catch {
         toast.error('Erro ao enviar imagem')
         setIsUploading(false)
         return

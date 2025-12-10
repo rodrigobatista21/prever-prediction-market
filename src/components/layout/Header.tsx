@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { TrendingUp, Wallet, Menu, LogOut, ChevronDown, Plus, BarChart3 } from 'lucide-react'
+import { TrendingUp, Wallet, Menu, LogOut, Plus, BarChart3 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,

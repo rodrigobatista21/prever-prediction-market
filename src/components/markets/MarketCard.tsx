@@ -3,7 +3,7 @@
 import { useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Clock, TrendingUp, TrendingDown, Users, Flame, Landmark, DollarSign, Trophy, Tv, Cpu, Globe, MoreHorizontal, Activity, ArrowUpRight, ArrowDownRight } from 'lucide-react'
+import { Clock, TrendingUp, Users, Flame, Landmark, DollarSign, Trophy, Tv, Cpu, Globe, MoreHorizontal, Activity, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Sparkline } from '@/components/ui/sparkline'
@@ -302,27 +302,6 @@ export function MarketCard({ market, className, variant = 'default', sparklineDa
         </CardContent>
       </Card>
     </Link>
-  )
-}
-
-interface OddsPillProps {
-  outcome: 'yes' | 'no'
-  odds: number
-}
-
-function OddsPill({ outcome, odds }: OddsPillProps) {
-  const isYes = outcome === 'yes'
-
-  return (
-    <div className={cn(
-      'px-4 py-2 rounded-lg font-semibold text-center min-w-[80px]',
-      isYes
-        ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
-        : 'bg-rose-500/10 text-rose-500 border border-rose-500/20'
-    )}>
-      <div className="text-xs opacity-70 mb-0.5">{isYes ? 'SIM' : 'NAO'}</div>
-      <div className="text-lg">{Math.round(odds)}%</div>
-    </div>
   )
 }
 

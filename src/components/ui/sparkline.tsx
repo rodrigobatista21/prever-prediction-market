@@ -20,7 +20,7 @@ export function Sparkline({
   color = 'auto',
   showArea = true,
 }: SparklineProps) {
-  const { path, areaPath, strokeColor, fillColor, trend } = useMemo(() => {
+  const { path, areaPath, strokeColor, fillColor } = useMemo(() => {
     if (!data.length) return { path: '', areaPath: '', strokeColor: '', fillColor: '', trend: 0 }
 
     const min = Math.min(...data)

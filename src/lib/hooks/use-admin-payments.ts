@@ -67,7 +67,6 @@ export function useAdminPayments() {
       )
 
       if (rpcError) {
-        console.error('useAdminPayments: RPC error', rpcError)
         setError(rpcError.message)
         return null
       }
@@ -75,7 +74,6 @@ export function useAdminPayments() {
       setData(result as PaymentReportResponse)
       return result as PaymentReportResponse
     } catch (err) {
-      console.error('useAdminPayments: Unexpected error', err)
       const message = err instanceof Error ? err.message : 'Erro ao carregar relatório'
       setError(message)
       return null

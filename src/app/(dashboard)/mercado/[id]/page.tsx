@@ -1,6 +1,6 @@
 'use client'
 
-import { use } from 'react'
+import { use, useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -12,7 +12,6 @@ import {
   BarChart3,
   Calendar,
   Info,
-  ExternalLink,
   Share2,
   Bookmark,
   CheckCircle2,
@@ -39,6 +38,15 @@ export default function MarketPage({ params }: MarketPageProps) {
   const { market, isLoading, error, refetch } = useMarket(id)
   const { user } = useAuth()
   const { balance, refetch: refetchBalance } = useBalance(user)
+
+  // Estado para timestamp estável (evita impure function durante render)
+  // Hooks devem ser chamados antes de qualquer early return
+  const [now, setNow] = useState(() => Date.now())
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 60000) // Atualiza a cada minuto
+    return () => clearInterval(interval)
+  }, [])
 
   const handleTradeSuccess = () => {
     refetch()
@@ -70,12 +78,12 @@ export default function MarketPage({ params }: MarketPageProps) {
   }
 
   const isResolved = market.outcome !== null
-  const isExpired = new Date(market.ends_at) < new Date()
+  const isExpired = new Date(market.ends_at) < new Date(now)
   const canTrade = !isResolved && !isExpired && user
 
   // Check if ending soon (within 24h)
   const endsAt = new Date(market.ends_at).getTime()
-  const isEndingSoon = !isResolved && !isExpired && (endsAt - Date.now()) < 24 * 60 * 60 * 1000
+  const isEndingSoon = !isResolved && !isExpired && (endsAt - now) < 24 * 60 * 60 * 1000
 
   return (
     <div className="space-y-6">

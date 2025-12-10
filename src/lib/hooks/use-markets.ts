@@ -53,7 +53,6 @@ export function useMarkets(): UseMarketsReturn {
       setMarkets((data ?? []).map(transformMarket))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao carregar mercados')
-      console.error('Erro ao buscar mercados:', err)
     } finally {
       setIsLoading(false)
     }

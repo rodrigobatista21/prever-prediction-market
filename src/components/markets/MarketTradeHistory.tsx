@@ -1,6 +1,6 @@
 'use client'
 
-import { Activity, TrendingUp, TrendingDown, User, Loader2 } from 'lucide-react'
+import { Activity, TrendingUp, TrendingDown, Loader2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useMarketTrades, type MarketTrade } from '@/lib/hooks/use-market-trades'
 import { formatBRL } from '@/lib/utils/format'

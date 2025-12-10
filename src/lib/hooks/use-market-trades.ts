@@ -58,12 +58,12 @@ export function useMarketTrades(marketId: string): UseMarketTradesReturn {
         .limit(50)
 
       if (queryError) {
-        console.error('Error fetching trades:', queryError)
         setError(queryError.message)
         return
       }
 
       // Transform data
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const transformedTrades: MarketTrade[] = (data || []).map((entry: any) => {
         // Parse description to extract outcome and shares
         // Format: "Compra de X.XX ações SIM/NÃO"
@@ -91,8 +91,7 @@ export function useMarketTrades(marketId: string): UseMarketTradesReturn {
       })
 
       setTrades(transformedTrades)
-    } catch (err) {
-      console.error('Unexpected error:', err)
+    } catch {
       setError('Erro ao carregar histórico')
     } finally {
       setIsLoading(false)

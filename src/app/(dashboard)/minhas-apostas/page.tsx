@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { TrendingUp, TrendingDown, ExternalLink, BarChart3 } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -52,13 +52,14 @@ export default function MinhasApostasPage() {
         .or('shares_yes.gt.0,shares_no.gt.0') // Apenas posições ativas
 
       if (error) {
-        console.error('Error fetching positions:', error)
         return
       }
 
       // Transforma e calcula métricas
       const positionsWithMetrics: PositionWithMarket[] = (data || [])
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .filter((p: any) => p.market) // Filtra mercados que existem
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .map((p: any) => {
           const market = p.market as Market
           const odds = calculateOdds({
@@ -93,8 +94,8 @@ export default function MinhasApostasPage() {
         .sort((a, b) => b.totalValue - a.totalValue) // Ordena por valor
 
       setPositions(positionsWithMetrics)
-    } catch (err) {
-      console.error('Unexpected error:', err)
+    } catch {
+      // Silently handle error - positions remain empty
     } finally {
       setIsLoading(false)
     }

@@ -51,7 +51,6 @@ export function useMarket(marketId: string): UseMarketReturn {
       setMarket(data ? transformMarket(data) : null)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao carregar mercado')
-      console.error('Erro ao buscar mercado:', err)
     } finally {
       setIsLoading(false)
     }

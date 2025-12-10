@@ -38,7 +38,6 @@ export function useBalance(user: User | null): UseBalanceReturn {
       setBalance(data ?? 0)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao carregar saldo')
-      console.error('Erro ao buscar saldo:', err)
     } finally {
       setIsLoading(false)
     }

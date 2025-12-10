@@ -65,7 +65,6 @@ export function useAuth(): UseAuthReturn {
         .single()
 
       if (error) {
-        console.error('useAuth: Error fetching profile', error)
         return null
       }
 
@@ -75,8 +74,7 @@ export function useAuth(): UseAuthReturn {
         setProfile(data)
       }
       return data
-    } catch (error) {
-      console.error('useAuth: Unexpected error fetching profile', error)
+    } catch {
       return null
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -97,7 +95,6 @@ export function useAuth(): UseAuthReturn {
         if (!mounted) return
 
         if (error) {
-          console.error('useAuth: Error getting session', error)
           setIsLoading(false)
           return
         }
@@ -119,8 +116,7 @@ export function useAuth(): UseAuthReturn {
         } else {
           setIsLoading(false)
         }
-      } catch (error) {
-        console.error('useAuth: Unexpected error', error)
+      } catch {
         if (mounted) setIsLoading(false)
       }
     }

@@ -63,11 +63,6 @@ export function TradePanel({
 
   const isDisabled = isLoading || amountNumber < 1 || amountNumber > balance
 
-  // Calculate current price per share (modelo "apostas": mais em SIM = maior prob SIM)
-  const currentPrice = outcome
-    ? poolYes / (poolYes + poolNo)
-    : poolNo / (poolYes + poolNo)
-
   return (
     <Card className="overflow-hidden border-border/50">
       {/* Outcome selector tabs */}
