@@ -4,9 +4,9 @@ import { useState, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
-import { Loader2, TrendingUp, TrendingDown, AlertCircle, Info, Sparkles } from 'lucide-react'
+import { Loader2, TrendingUp, TrendingDown, AlertCircle, Info, Sparkles, AlertTriangle, XCircle } from 'lucide-react'
 import { formatBRL, formatROI, formatShares } from '@/lib/utils/format'
-import { previewBuy, type MarketPools } from '@/lib/utils/cpmm'
+import { previewBuy, calculateMaxRecommendedAmount, getSlippageWarning, type MarketPools } from '@/lib/utils/cpmm'
 import { useTrade } from '@/lib/hooks/use-trade'
 import { cn } from '@/lib/utils'
 
@@ -33,11 +33,23 @@ export function TradePanel({
 
   const amountNumber = parseFloat(amount) || 0
 
+  const pools: MarketPools = useMemo(() => ({ poolYes, poolNo }), [poolYes, poolNo])
+
   const preview = useMemo(() => {
     if (amountNumber < 1) return null
-    const pools: MarketPools = { poolYes, poolNo }
     return previewBuy(pools, outcome, amountNumber)
-  }, [poolYes, poolNo, outcome, amountNumber])
+  }, [pools, outcome, amountNumber])
+
+  // Calcula valor maximo recomendado para slippage aceitavel
+  const maxRecommended = useMemo(() => {
+    return calculateMaxRecommendedAmount(pools, outcome)
+  }, [pools, outcome])
+
+  // Obtem aviso de slippage se houver
+  const slippageWarning = useMemo(() => {
+    if (!preview) return null
+    return getSlippageWarning(preview.slippageLevel)
+  }, [preview])
 
   const handleAmountChange = (value: string) => {
     const cleaned = value.replace(/[^\d,\.]/g, '').replace(',', '.')
@@ -150,7 +162,12 @@ export function TradePanel({
 
         {/* Preview */}
         {preview && (
-          <div className="rounded-xl bg-muted/30 border border-border/50 p-4 space-y-3">
+          <div className={cn(
+            "rounded-xl border p-4 space-y-3",
+            preview.slippageLevel === 'extreme' ? 'bg-rose-500/10 border-rose-500/50' :
+            preview.slippageLevel === 'high' ? 'bg-amber-500/10 border-amber-500/50' :
+            'bg-muted/30 border-border/50'
+          )}>
             <div className="flex items-center gap-2 text-sm font-medium">
               <Sparkles className="w-4 h-4 text-primary" />
               Previsão
@@ -165,6 +182,25 @@ export function TradePanel({
                 <span className="text-muted-foreground">Preço médio</span>
                 <span className="font-medium">
                   {formatBRL(preview.pricePerShare)}/ação
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Preço de mercado</span>
+                <span className="font-medium">
+                  {formatBRL(outcome ? poolYes / (poolYes + poolNo) : poolNo / (poolYes + poolNo))}/ação
+                </span>
+              </div>
+              {/* Slippage indicator */}
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Slippage</span>
+                <span className={cn(
+                  'font-medium',
+                  preview.slippageLevel === 'low' ? 'text-emerald-500' :
+                  preview.slippageLevel === 'medium' ? 'text-amber-500' :
+                  preview.slippageLevel === 'high' ? 'text-orange-500' :
+                  'text-rose-500'
+                )}>
+                  {preview.slippage > 0 ? '+' : ''}{(preview.slippage * 100).toFixed(1)}%
                 </span>
               </div>
               <div className="h-px bg-border/50 my-2" />
@@ -185,6 +221,34 @@ export function TradePanel({
                   {formatROI(preview.roi)}
                 </span>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Slippage Warning */}
+        {slippageWarning && (
+          <div className={cn(
+            'flex items-start gap-2 text-sm rounded-lg p-3',
+            slippageWarning.severity === 'info' ? 'bg-blue-500/10 text-blue-500' :
+            slippageWarning.severity === 'warning' ? 'bg-amber-500/10 text-amber-500' :
+            'bg-rose-500/10 text-rose-500'
+          )}>
+            {slippageWarning.severity === 'error' ? (
+              <XCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            ) : (
+              <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            )}
+            <div className="space-y-1">
+              <p className="font-medium">{slippageWarning.title}</p>
+              <p className="text-xs opacity-90">{slippageWarning.message}</p>
+              {maxRecommended < amountNumber && (
+                <button
+                  onClick={() => handleQuickAmount(maxRecommended)}
+                  className="text-xs underline hover:no-underline"
+                >
+                  Usar valor recomendado: {formatBRL(maxRecommended)}
+                </button>
+              )}
             </div>
           </div>
         )}
