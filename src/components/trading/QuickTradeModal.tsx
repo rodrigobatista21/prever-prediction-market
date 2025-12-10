@@ -49,6 +49,20 @@ export function QuickTradeModal({
   const currentPrices = outcome ? yesPrices : noPrices
   const bestAsk = currentPrices?.best_ask
 
+  // Debug logging - remove after fix
+  console.log('[QuickTradeModal] Debug:', {
+    marketId: market.id,
+    outcome,
+    yesPrices,
+    noPrices,
+    currentPrices,
+    bestAsk,
+    yesLoading,
+    noLoading,
+    user: user?.id,
+    balance
+  })
+
   // Calculate preview
   const preview = useMemo(() => {
     if (amountNumber <= 0 || !bestAsk || bestAsk <= 0 || bestAsk >= 1) {
