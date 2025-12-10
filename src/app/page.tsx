@@ -167,7 +167,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Stats Bar */}
+      {/* Stats Bar - Simplified monochrome palette */}
       <div className="flex flex-wrap items-center justify-between gap-4 py-4 border-y border-border/50">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -175,19 +175,19 @@ export default function HomePage() {
         </div>
         <div className="flex items-center gap-6 text-sm">
           <StatItem
-            icon={<Activity className="w-4 h-4 text-emerald-500" />}
+            icon={<Activity className="w-4 h-4 text-muted-foreground" />}
             label="Volume Total"
             value={formatBRL(totalVolume)}
           />
           <div className="w-px h-4 bg-border" />
           <StatItem
-            icon={<BarChart3 className="w-4 h-4 text-blue-500" />}
+            icon={<BarChart3 className="w-4 h-4 text-muted-foreground" />}
             label="Teses Ativas"
             value={activeMarkets.toString()}
           />
           <div className="w-px h-4 bg-border hidden sm:block" />
           <StatItem
-            icon={<Target className="w-4 h-4 text-amber-500" />}
+            icon={<Target className="w-4 h-4 text-muted-foreground" />}
             label="Traders"
             value={totalTraders.toString()}
             className="hidden sm:flex"
@@ -200,7 +200,7 @@ export default function HomePage() {
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Flame className="w-5 h-5 text-amber-500" />
+              <Flame className="w-5 h-5 text-muted-foreground" />
               <h2 className="text-lg font-bold">Destaque</h2>
             </div>
             <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground gap-1">
@@ -230,7 +230,7 @@ export default function HomePage() {
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-emerald-500" />
+              <TrendingUp className="w-5 h-5 text-muted-foreground" />
               <h2 className="text-lg font-bold">Mais Negociados</h2>
             </div>
           </div>
@@ -459,20 +459,22 @@ function HowItWorksStep({
 function MarketCardSkeleton() {
   return (
     <Card className="overflow-hidden border-border/50">
-      <Skeleton className="h-32 w-full" />
-      <div className="p-4 space-y-3">
-        <Skeleton className="h-10 w-full" />
-        <div className="flex justify-between">
-          <Skeleton className="h-12 w-20" />
-          <Skeleton className="h-7 w-16" />
+      <div className="p-4 space-y-4">
+        {/* Badge */}
+        <Skeleton className="h-5 w-24" />
+        {/* Title */}
+        <Skeleton className="h-12 w-full" />
+        {/* Probability bar */}
+        <Skeleton className="h-3 w-full rounded-full" />
+        {/* Odds row */}
+        <div className="flex justify-between items-center">
+          <Skeleton className="h-9 w-16" />
+          <Skeleton className="h-7 w-20" />
         </div>
-        <div className="flex gap-2">
-          <Skeleton className="h-9 flex-1" />
-          <Skeleton className="h-9 flex-1" />
-        </div>
-        <div className="flex justify-between pt-2 border-t border-border/50">
+        {/* Footer */}
+        <div className="flex justify-between pt-3 border-t border-border/50">
           <Skeleton className="h-4 w-20" />
-          <Skeleton className="h-4 w-16" />
+          <Skeleton className="h-4 w-20" />
         </div>
       </div>
     </Card>
