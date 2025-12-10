@@ -24,6 +24,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { OddsBar } from '@/components/markets/OddsBar'
 import { OddsChart } from '@/components/markets/OddsChart'
 import { MarketTradeHistory } from '@/components/markets/MarketTradeHistory'
+import { MarketOrderBook } from '@/components/markets/MarketOrderBook'
 import { TradePanel } from '@/components/trading/TradePanel'
 import { useMarket, useAuth, useBalance } from '@/lib/hooks'
 import { formatBRL, formatDate, formatRelativeDate } from '@/lib/utils/format'
@@ -232,6 +233,9 @@ export default function MarketPage({ params }: MarketPageProps) {
               </div>
             </CardContent>
           </Card>
+
+          {/* Order Book */}
+          <MarketOrderBook marketId={market.id} />
 
           {/* Odds Chart */}
           <OddsChart marketId={market.id} className="border-border/50" />
