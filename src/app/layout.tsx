@@ -59,8 +59,12 @@ export const viewport: Viewport = {
   ],
 };
 
-// Force dynamic rendering for all pages to ensure fresh auth state
-export const dynamic = 'force-dynamic'
+// REMOVIDO: force-dynamic não é necessário porque:
+// 1. Todas as páginas são Client Components ('use client')
+// 2. Auth é gerenciado via hooks que fazem fetch no cliente
+// 3. Header e dados são atualizados via Supabase Realtime
+// 4. Isso permite que Next.js gere HTML estático para o shell,
+//    melhorando TTFB (Time to First Byte)
 
 export default function RootLayout({
   children,

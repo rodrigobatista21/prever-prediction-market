@@ -1,10 +1,18 @@
 /**
- * Cálculos CPMM (Constant Product Market Maker)
+ * Calculos CPMM (Constant Product Market Maker)
  *
- * IMPORTANTE: Estes cálculos são apenas para PREVIEW no cliente.
- * A lógica real de transação roda 100% no PostgreSQL via Stored Procedures.
+ * IMPORTANTE: Estes calculos devem ser IDENTICOS aos do servidor (stored procedures).
+ * A logica real de transacao roda no PostgreSQL, mas o preview deve mostrar valores exatos.
  *
- * Fórmula base: k = pool_yes × pool_no (constante)
+ * Modelo: Constant Product AMM
+ * - k = pool_yes * pool_no (constante durante trade)
+ * - Comprar SIM: adiciona ao pool_yes, remove do pool_no (mantendo k)
+ * - Comprar NAO: adiciona ao pool_no, remove do pool_yes (mantendo k)
+ * - Shares recebidas = diferenca no pool oposto
+ *
+ * Formula de preco (probabilidade):
+ * - Preco SIM = pool_yes / (pool_yes + pool_no)
+ * - Preco NAO = pool_no / (pool_yes + pool_no)
  */
 
 export interface MarketPools {
@@ -25,26 +33,29 @@ export interface TradePreview {
 }
 
 /**
- * Calcula a probabilidade/preço do SIM
- * Preço SIM = pool_yes / (pool_yes + pool_no)
+ * Calcula a probabilidade/preco do SIM
+ * Preco SIM = pool_yes / (pool_yes + pool_no)
  *
- * Lógica: Quanto mais dinheiro apostado em SIM, maior a probabilidade de SIM.
- * Os pools representam o total de dinheiro apostado em cada lado.
+ * Logica: Quanto mais dinheiro apostado em SIM, maior a probabilidade de SIM.
  */
 export function calculateYesPrice(pools: MarketPools): number {
   const { poolYes, poolNo } = pools
-  return poolYes / (poolYes + poolNo)
+  const total = poolYes + poolNo
+  if (total === 0) return 0.5
+  return poolYes / total
 }
 
 /**
- * Calcula a probabilidade/preço do NÃO
- * Preço NÃO = pool_no / (pool_yes + pool_no)
+ * Calcula a probabilidade/preco do NAO
+ * Preco NAO = pool_no / (pool_yes + pool_no)
  *
- * Lógica: Quanto mais dinheiro apostado em NÃO, maior a probabilidade de NÃO.
+ * Logica: Quanto mais dinheiro apostado em NAO, maior a probabilidade de NAO.
  */
 export function calculateNoPrice(pools: MarketPools): number {
   const { poolYes, poolNo } = pools
-  return poolNo / (poolYes + poolNo)
+  const total = poolYes + poolNo
+  if (total === 0) return 0.5
+  return poolNo / total
 }
 
 /**
@@ -58,41 +69,66 @@ export function calculateOdds(pools: MarketPools): { yes: number; no: number } {
 }
 
 /**
- * Preview de compra de ações SIM
+ * Calcula o valor de k (constante do CPMM)
+ */
+export function calculateK(pools: MarketPools): number {
+  return pools.poolYes * pools.poolNo
+}
+
+/**
+ * Calcula liquidez total do mercado
+ */
+export function calculateTotalLiquidity(pools: MarketPools): number {
+  return pools.poolYes + pools.poolNo
+}
+
+/**
+ * Preview de compra de acoes SIM usando Constant Product AMM
  *
- * Modelo "dinheiro apostado":
- * - Quando compra SIM, adiciona ao pool_yes
- * - Shares = amount / preço atual
- * - Preço sobe após a compra (mais demanda = mais caro)
+ * Logica identica ao servidor (rpc_buy_shares):
+ * 1. k = pool_yes * pool_no (constante)
+ * 2. new_pool_yes = pool_yes + amount
+ * 3. new_pool_no = k / new_pool_yes
+ * 4. shares_out = pool_no - new_pool_no
+ *
+ * @param pools Estado atual dos pools
+ * @param amount Valor em BRL a investir
+ * @returns Preview da transacao
  */
 export function previewBuyYes(pools: MarketPools, amount: number): TradePreview {
   const { poolYes, poolNo } = pools
-  const total = poolYes + poolNo
 
+  // Preco antes (para exibicao)
   const priceBefore = calculateYesPrice(pools)
 
-  // Shares = dinheiro / preço
-  const sharesOut = amount / priceBefore
+  // Constant Product: k = x * y
+  const k = poolYes * poolNo
 
-  // Novos pools após a compra
+  // Novos pools apos a compra (mantendo k constante)
   const newPoolYes = poolYes + amount
-  const newPoolNo = poolNo // Pool contrário não muda neste modelo simplificado
-  const newTotal = newPoolYes + newPoolNo
+  const newPoolNo = k / newPoolYes
 
-  // Novo preço após a compra
+  // Shares = diferenca no pool oposto
+  const sharesOut = poolNo - newPoolNo
+
+  // Preco medio efetivo (quanto pagou por share)
+  const pricePerShare = sharesOut > 0 ? amount / sharesOut : 0
+
+  // Novo preco apos a compra
+  const newTotal = newPoolYes + newPoolNo
   const priceAfter = newPoolYes / newTotal
 
   // Cada share vale R$ 1,00 se ganhar
   const estimatedReturn = sharesOut
-  const roi = (estimatedReturn - amount) / amount
+  const roi = amount > 0 ? (estimatedReturn - amount) / amount : 0
 
   return {
     sharesOut,
-    pricePerShare: priceBefore,
+    pricePerShare,
     priceImpact: priceAfter - priceBefore,
     newOdds: {
       yes: priceAfter,
-      no: 1 - priceAfter,
+      no: newPoolNo / newTotal,
     },
     estimatedReturn,
     roi,
@@ -100,38 +136,47 @@ export function previewBuyYes(pools: MarketPools, amount: number): TradePreview 
 }
 
 /**
- * Preview de compra de ações NÃO
+ * Preview de compra de acoes NAO usando Constant Product AMM
  *
- * Modelo "dinheiro apostado":
- * - Quando compra NÃO, adiciona ao pool_no
- * - Shares = amount / preço atual
- * - Preço sobe após a compra
+ * Logica identica ao servidor (rpc_buy_shares com p_outcome=false):
+ * 1. k = pool_yes * pool_no (constante)
+ * 2. new_pool_no = pool_no + amount
+ * 3. new_pool_yes = k / new_pool_no
+ * 4. shares_out = pool_yes - new_pool_yes
  */
 export function previewBuyNo(pools: MarketPools, amount: number): TradePreview {
   const { poolYes, poolNo } = pools
 
+  // Preco antes (para exibicao)
   const priceBefore = calculateNoPrice(pools)
 
-  // Shares = dinheiro / preço
-  const sharesOut = amount / priceBefore
+  // Constant Product: k = x * y
+  const k = poolYes * poolNo
 
-  // Novos pools após a compra
+  // Novos pools apos a compra (mantendo k constante)
   const newPoolNo = poolNo + amount
-  const newPoolYes = poolYes // Pool contrário não muda
-  const newTotal = newPoolYes + newPoolNo
+  const newPoolYes = k / newPoolNo
 
-  // Novo preço após a compra
+  // Shares = diferenca no pool oposto
+  const sharesOut = poolYes - newPoolYes
+
+  // Preco medio efetivo
+  const pricePerShare = sharesOut > 0 ? amount / sharesOut : 0
+
+  // Novo preco apos a compra
+  const newTotal = newPoolYes + newPoolNo
   const priceAfter = newPoolNo / newTotal
 
+  // Cada share vale R$ 1,00 se ganhar
   const estimatedReturn = sharesOut
-  const roi = (estimatedReturn - amount) / amount
+  const roi = amount > 0 ? (estimatedReturn - amount) / amount : 0
 
   return {
     sharesOut,
-    pricePerShare: priceBefore,
+    pricePerShare,
     priceImpact: priceAfter - priceBefore,
     newOdds: {
-      yes: 1 - priceAfter,
+      yes: newPoolYes / newTotal,
       no: priceAfter,
     },
     estimatedReturn,
@@ -140,7 +185,7 @@ export function previewBuyNo(pools: MarketPools, amount: number): TradePreview {
 }
 
 /**
- * Preview de compra genérica
+ * Preview de compra generica
  */
 export function previewBuy(
   pools: MarketPools,
@@ -153,65 +198,88 @@ export function previewBuy(
 }
 
 /**
- * Preview de venda de ações SIM
- * Lógica inversa: usuário devolve shares, recebe BRL
- * Vender SIM = remove dinheiro do pool_yes
+ * Preview de venda de acoes SIM usando Constant Product AMM
+ *
+ * Logica identica ao servidor (rpc_sell_shares com p_outcome=true):
+ * 1. k = pool_yes * pool_no (constante)
+ * 2. new_pool_no = pool_no + shares (devolve shares ao pool)
+ * 3. new_pool_yes = k / new_pool_no
+ * 4. amount_out = pool_yes - new_pool_yes (recebe BRL)
  */
 export function previewSellYes(pools: MarketPools, shares: number): TradePreview {
   const { poolYes, poolNo } = pools
 
+  // Preco antes
   const priceBefore = calculateYesPrice(pools)
 
-  // Valor recebido = shares * preço atual
-  const amountOut = shares * priceBefore
+  // Constant Product: k = x * y
+  const k = poolYes * poolNo
 
-  // Novos pools após a venda (remove do pool_yes)
-  const newPoolYes = Math.max(0, poolYes - amountOut)
-  const newPoolNo = poolNo
+  // Vender SIM = adicionar shares ao pool_no
+  const newPoolNo = poolNo + shares
+  const newPoolYes = k / newPoolNo
+
+  // Valor recebido = diferenca no pool_yes
+  const amountOut = poolYes - newPoolYes
+
+  // Preco medio efetivo de venda
+  const pricePerShare = shares > 0 ? amountOut / shares : 0
+
+  // Novo preco apos a venda
   const newTotal = newPoolYes + newPoolNo
-
-  // Novo preço após a venda (preço cai)
   const priceAfter = newTotal > 0 ? newPoolYes / newTotal : 0
 
   return {
-    sharesOut: amountOut, // Na venda, sharesOut é o BRL recebido
-    pricePerShare: priceBefore,
+    sharesOut: amountOut, // Na venda, retorna o BRL recebido
+    pricePerShare,
     priceImpact: priceAfter - priceBefore,
     newOdds: {
       yes: priceAfter,
-      no: 1 - priceAfter,
+      no: newTotal > 0 ? newPoolNo / newTotal : 0,
     },
     estimatedReturn: amountOut,
-    roi: 0, // Não aplicável na venda
+    roi: 0, // Nao aplicavel na venda direta
   }
 }
 
 /**
- * Preview de venda de ações NÃO
- * Vender NÃO = remove dinheiro do pool_no
+ * Preview de venda de acoes NAO usando Constant Product AMM
+ *
+ * Logica identica ao servidor (rpc_sell_shares com p_outcome=false):
+ * 1. k = pool_yes * pool_no (constante)
+ * 2. new_pool_yes = pool_yes + shares (devolve shares ao pool)
+ * 3. new_pool_no = k / new_pool_yes
+ * 4. amount_out = pool_no - new_pool_no (recebe BRL)
  */
 export function previewSellNo(pools: MarketPools, shares: number): TradePreview {
   const { poolYes, poolNo } = pools
 
+  // Preco antes
   const priceBefore = calculateNoPrice(pools)
 
-  // Valor recebido = shares * preço atual
-  const amountOut = shares * priceBefore
+  // Constant Product: k = x * y
+  const k = poolYes * poolNo
 
-  // Novos pools após a venda (remove do pool_no)
-  const newPoolNo = Math.max(0, poolNo - amountOut)
-  const newPoolYes = poolYes
+  // Vender NAO = adicionar shares ao pool_yes
+  const newPoolYes = poolYes + shares
+  const newPoolNo = k / newPoolYes
+
+  // Valor recebido = diferenca no pool_no
+  const amountOut = poolNo - newPoolNo
+
+  // Preco medio efetivo de venda
+  const pricePerShare = shares > 0 ? amountOut / shares : 0
+
+  // Novo preco apos a venda
   const newTotal = newPoolYes + newPoolNo
-
-  // Novo preço após a venda (preço cai)
   const priceAfter = newTotal > 0 ? newPoolNo / newTotal : 0
 
   return {
-    sharesOut: amountOut,
-    pricePerShare: priceBefore,
+    sharesOut: amountOut, // Na venda, retorna o BRL recebido
+    pricePerShare,
     priceImpact: priceAfter - priceBefore,
     newOdds: {
-      yes: 1 - priceAfter,
+      yes: newTotal > 0 ? newPoolYes / newTotal : 0,
       no: priceAfter,
     },
     estimatedReturn: amountOut,
@@ -220,7 +288,7 @@ export function previewSellNo(pools: MarketPools, shares: number): TradePreview 
 }
 
 /**
- * Preview de venda genérica
+ * Preview de venda generica
  */
 export function previewSell(
   pools: MarketPools,
@@ -230,18 +298,4 @@ export function previewSell(
   return outcome
     ? previewSellYes(pools, shares)
     : previewSellNo(pools, shares)
-}
-
-/**
- * Calcula liquidez total do mercado
- */
-export function calculateTotalLiquidity(pools: MarketPools): number {
-  return pools.poolYes + pools.poolNo
-}
-
-/**
- * Calcula o valor de k (constante do CPMM)
- */
-export function calculateK(pools: MarketPools): number {
-  return pools.poolYes * pools.poolNo
 }
