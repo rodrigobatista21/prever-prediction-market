@@ -40,14 +40,10 @@ function LoginForm() {
   // IMPORTANTE: callback NÃO pode ser async - causa deadlock com outras chamadas
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth event:', event, 'Session:', !!session)
-
       if (event === 'PASSWORD_RECOVERY') {
-        console.log('PASSWORD_RECOVERY event received')
         setShowResetPassword(true)
         setProcessingCode(false)
       } else if (event === 'SIGNED_IN' && searchParams.get('code')) {
-        console.log('SIGNED_IN with code param - showing reset form')
         setShowResetPassword(true)
         setProcessingCode(false)
       }
@@ -63,7 +59,6 @@ function LoginForm() {
       const timeoutId = setTimeout(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
           if (session) {
-            console.log('Session found after timeout, showing reset form')
             setShowResetPassword(true)
           } else {
             setError('Link expirado ou inválido. Solicite um novo.')
@@ -132,7 +127,6 @@ function LoginForm() {
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('handleUpdatePassword called, password length:', newPassword.length)
 
     if (newPassword.length < 6) {
       setError('A senha deve ter pelo menos 6 caracteres')
@@ -150,29 +144,21 @@ function LoginForm() {
     // IMPORTANTE: Unsubscribe do listener ANTES de chamar updateUser
     // O onAuthStateChange pode causar deadlock com outras chamadas do Supabase
     if (subscriptionRef.current) {
-      console.log('Unsubscribing auth listener before updateUser...')
       subscriptionRef.current.unsubscribe()
       subscriptionRef.current = null
     }
 
-    console.log('Calling updateUser...')
-
     try {
-      const { data, error: updateError } = await supabase.auth.updateUser({
+      const { error: updateError } = await supabase.auth.updateUser({
         password: newPassword
       })
 
-      console.log('updateUser completed:', { data, error: updateError })
-
       if (updateError) {
-        console.error('Update password error:', updateError.message)
         setError(updateError.message)
       } else {
-        console.log('Password updated successfully!')
         setPasswordUpdated(true)
       }
-    } catch (err) {
-      console.error('Catch error:', err)
+    } catch {
       setError('Erro ao atualizar senha. Tente novamente.')
     }
 

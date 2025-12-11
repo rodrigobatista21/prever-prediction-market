@@ -76,7 +76,7 @@ export interface PlaceOrderResult {
   remaining_quantity?: number
   avg_price?: number
   total_cost?: number
-  status?: 'open' | 'partial' | 'filled'
+  status?: 'open' | 'partial' | 'filled' | 'cancelled'
 }
 
 export interface UserPosition {

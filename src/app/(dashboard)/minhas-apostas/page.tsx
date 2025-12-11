@@ -64,7 +64,7 @@ interface UnifiedPosition {
   isOpen: boolean
   isYes: boolean
   shares: number
-  avgCost: number
+  avgCost: number | null
   currentValue: number
   pnl: number
   pnlPercent: number
@@ -76,8 +76,8 @@ interface UnifiedPosition {
   hasNo?: boolean
   sharesYes?: number
   sharesNo?: number
-  avgCostYes?: number
-  avgCostNo?: number
+  avgCostYes?: number | null
+  avgCostNo?: number | null
   currentOddsYes?: number
   currentOddsNo?: number
 }
@@ -343,7 +343,7 @@ export default function MinhasApostasPage() {
   // Total geral
   const totalValue = unifiedPositions.reduce((sum, p) => sum + p.currentValue, 0)
   const totalPnL = unifiedPositions.reduce((sum, p) => sum + p.pnl, 0)
-  const totalInvested = unifiedPositions.reduce((sum, p) => sum + (p.avgCost * p.shares), 0)
+  const totalInvested = unifiedPositions.reduce((sum, p) => sum + ((p.avgCost ?? 0) * p.shares), 0)
   const totalROI = totalInvested > 0 ? (totalPnL / totalInvested) * 100 : 0
 
   return (

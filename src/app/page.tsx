@@ -172,7 +172,7 @@ export default function HomePage() {
         sorted.sort((a, b) => new Date(a.ends_at).getTime() - new Date(b.ends_at).getTime())
         break
       case 'recent':
-        sorted.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        sorted.sort((a, b) => new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime())
         break
     }
 

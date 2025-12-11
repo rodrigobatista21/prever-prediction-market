@@ -60,6 +60,8 @@ export function useAdminPayments() {
     setError(null)
 
     try {
+      // Note: get_admin_payment_report has optional p_market_id parameter
+      // Supabase client types don't handle optional args well, so we use type assertion
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: result, error: rpcError } = await (supabase.rpc as any)(
         'get_admin_payment_report',

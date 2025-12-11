@@ -39,6 +39,8 @@ export function useAdmin() {
     setError(null)
 
     try {
+      // Note: rpc_create_market has overloaded definitions in PG
+      // Using type assertion for compatibility
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error: rpcError } = await (supabase.rpc as any)('rpc_create_market', {
         p_title: params.title,

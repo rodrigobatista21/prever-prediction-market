@@ -1,5 +1,8 @@
-// Tipos do banco de dados Supabase
-// Gerar automaticamente com: npx supabase gen types typescript --project-id YOUR_PROJECT_ID > src/lib/types/database.types.ts
+/**
+ * Tipos gerados automaticamente do schema do Supabase
+ * Projeto: yycqshcmbzrbnsikeoun (prever-br)
+ * Gerado em: 2025-12-11
+ */
 
 export type Json =
   | string
@@ -25,6 +28,11 @@ export type MarketCategory =
   | 'cripto'
   | 'geopolitica'
 
+export type OrderSide = 'buy' | 'sell'
+export type OrderType = 'limit' | 'market'
+export type OrderStatus = 'open' | 'partial' | 'filled' | 'cancelled'
+export type MarketStatus = 'open' | 'won' | 'lost'
+
 export interface Database {
   public: {
     Tables: {
@@ -33,25 +41,25 @@ export interface Database {
           id: string
           full_name: string | null
           avatar_url: string | null
-          is_admin: boolean
-          created_at: string
-          updated_at: string
+          is_admin: boolean | null
+          created_at: string | null
+          updated_at: string | null
         }
         Insert: {
           id: string
           full_name?: string | null
           avatar_url?: string | null
-          is_admin?: boolean
-          created_at?: string
-          updated_at?: string
+          is_admin?: boolean | null
+          created_at?: string | null
+          updated_at?: string | null
         }
         Update: {
           id?: string
           full_name?: string | null
           avatar_url?: string | null
-          is_admin?: boolean
-          created_at?: string
-          updated_at?: string
+          is_admin?: boolean | null
+          created_at?: string | null
+          updated_at?: string | null
         }
       }
       markets: {
@@ -66,8 +74,9 @@ export interface Database {
           pool_yes: number
           pool_no: number
           created_by: string | null
-          created_at: string
+          created_at: string | null
           resolved_at: string | null
+          initial_k: number | null
         }
         Insert: {
           id?: string
@@ -80,8 +89,9 @@ export interface Database {
           pool_yes?: number
           pool_no?: number
           created_by?: string | null
-          created_at?: string
+          created_at?: string | null
           resolved_at?: string | null
+          initial_k?: number | null
         }
         Update: {
           id?: string
@@ -94,8 +104,9 @@ export interface Database {
           pool_yes?: number
           pool_no?: number
           created_by?: string | null
-          created_at?: string
+          created_at?: string | null
           resolved_at?: string | null
+          initial_k?: number | null
         }
       }
       ledger_entries: {
@@ -126,10 +137,10 @@ export interface Database {
           market_id: string
           shares_yes: number
           shares_no: number
-          avg_cost_yes: number
-          avg_cost_no: number
-          created_at: string
-          updated_at: string
+          avg_cost_yes: number | null
+          avg_cost_no: number | null
+          created_at: string | null
+          updated_at: string | null
         }
         Insert: {
           id?: string
@@ -137,10 +148,10 @@ export interface Database {
           market_id: string
           shares_yes?: number
           shares_no?: number
-          avg_cost_yes?: number
-          avg_cost_no?: number
-          created_at?: string
-          updated_at?: string
+          avg_cost_yes?: number | null
+          avg_cost_no?: number | null
+          created_at?: string | null
+          updated_at?: string | null
         }
         Update: {
           id?: string
@@ -148,10 +159,10 @@ export interface Database {
           market_id?: string
           shares_yes?: number
           shares_no?: number
-          avg_cost_yes?: number
-          avg_cost_no?: number
-          created_at?: string
-          updated_at?: string
+          avg_cost_yes?: number | null
+          avg_cost_no?: number | null
+          created_at?: string | null
+          updated_at?: string | null
         }
       }
       audit_logs: {
@@ -165,7 +176,7 @@ export interface Database {
           new_data: Json | null
           ip_address: string | null
           user_agent: string | null
-          metadata: Json
+          metadata: Json | null
           created_at: string
         }
         Insert: {
@@ -178,10 +189,39 @@ export interface Database {
           new_data?: Json | null
           ip_address?: string | null
           user_agent?: string | null
-          metadata?: Json
+          metadata?: Json | null
           created_at?: string
         }
         Update: never // Audit logs são imutáveis
+      }
+      odds_history: {
+        Row: {
+          id: string
+          market_id: string
+          odds_yes: number
+          odds_no: number
+          pool_yes: number
+          pool_no: number
+          recorded_at: string
+        }
+        Insert: {
+          id?: string
+          market_id: string
+          odds_yes: number
+          odds_no: number
+          pool_yes: number
+          pool_no: number
+          recorded_at?: string
+        }
+        Update: {
+          id?: string
+          market_id?: string
+          odds_yes?: number
+          odds_no?: number
+          pool_yes?: number
+          pool_no?: number
+          recorded_at?: string
+        }
       }
       orders: {
         Row: {
@@ -189,13 +229,13 @@ export interface Database {
           market_id: string
           user_id: string
           outcome: boolean
-          side: string
-          order_type: string
+          side: OrderSide
+          order_type: OrderType
           price: number | null
           quantity: number
           filled_quantity: number
           avg_fill_price: number | null
-          status: string
+          status: OrderStatus
           is_platform_order: boolean
           expires_at: string | null
           created_at: string
@@ -206,13 +246,13 @@ export interface Database {
           market_id: string
           user_id: string
           outcome: boolean
-          side: string
-          order_type?: string
+          side: OrderSide
+          order_type?: OrderType
           price?: number | null
           quantity: number
           filled_quantity?: number
           avg_fill_price?: number | null
-          status?: string
+          status?: OrderStatus
           is_platform_order?: boolean
           expires_at?: string | null
           created_at?: string
@@ -223,13 +263,13 @@ export interface Database {
           market_id?: string
           user_id?: string
           outcome?: boolean
-          side?: string
-          order_type?: string
+          side?: OrderSide
+          order_type?: OrderType
           price?: number | null
           quantity?: number
           filled_quantity?: number
           avg_fill_price?: number | null
-          status?: string
+          status?: OrderStatus
           is_platform_order?: boolean
           expires_at?: string | null
           created_at?: string
@@ -283,8 +323,8 @@ export interface Database {
       user_shares: {
         Row: {
           id: string
-          user_id: string
           market_id: string
+          user_id: string
           outcome: boolean
           quantity: number
           avg_cost: number | null
@@ -294,8 +334,8 @@ export interface Database {
         }
         Insert: {
           id?: string
-          user_id: string
           market_id: string
+          user_id: string
           outcome: boolean
           quantity?: number
           avg_cost?: number | null
@@ -305,8 +345,8 @@ export interface Database {
         }
         Update: {
           id?: string
-          user_id?: string
           market_id?: string
+          user_id?: string
           outcome?: boolean
           quantity?: number
           avg_cost?: number | null
@@ -317,72 +357,47 @@ export interface Database {
       }
     }
     Functions: {
-      rpc_deposit_mock: {
-        Args: {
-          p_user_id: string
-          p_amount: number
-        }
-        Returns: Json
-      }
-      rpc_create_market: {
-        Args: {
-          p_title: string
-          p_description: string
-          p_category?: MarketCategory
-          p_ends_at: string
-          p_initial_liquidity?: number
-          p_image_url?: string | null
-        }
-        Returns: Json
-      }
-      rpc_resolve_market: {
-        Args: {
-          p_market_id: string
-          p_winning_outcome: boolean
-        }
-        Returns: Json
-      }
+      // ============================================
+      // RPC Functions - Tipadas para eliminar "as any"
+      // ============================================
+
       get_user_balance: {
-        Args: {
-          p_user_id: string
-        }
+        Args: { p_user_id: string }
         Returns: number
       }
+
       get_market_odds: {
-        Args: {
-          p_market_id: string
-        }
+        Args: { p_market_id: string }
         Returns: {
           price_yes: number
           price_no: number
           total_liquidity: number
         }[]
       }
-      place_order: {
-        Args: {
-          p_user_id: string
-          p_market_id: string
-          p_outcome: boolean
-          p_side: string
-          p_order_type: string
-          p_price: number | null
-          p_quantity: number
-        }
-        Returns: Json
+
+      get_best_prices: {
+        Args: { p_market_id: string; p_outcome: boolean }
+        Returns: {
+          best_bid: number | null
+          best_ask: number | null
+          bid_quantity: number | null
+          ask_quantity: number | null
+        }[]
       }
-      cancel_order: {
-        Args: {
-          p_user_id: string
-          p_order_id: string
-        }
-        Returns: Json
+
+      get_order_book: {
+        Args: { p_market_id: string }
+        Returns: {
+          outcome: boolean
+          side: string
+          price: number
+          total_quantity: number
+          order_count: number
+        }[]
       }
+
       get_order_book_detailed: {
-        Args: {
-          p_market_id: string
-          p_outcome: boolean
-          p_depth?: number
-        }
+        Args: { p_market_id: string; p_outcome: boolean; p_depth?: number }
         Returns: {
           side: string
           price: number
@@ -391,22 +406,9 @@ export interface Database {
           order_count: number
         }[]
       }
-      get_best_prices: {
-        Args: {
-          p_market_id: string
-          p_outcome: boolean
-        }
-        Returns: {
-          best_bid: number | null
-          best_ask: number | null
-          bid_quantity: number | null
-          ask_quantity: number | null
-        }[]
-      }
+
       get_user_open_orders: {
-        Args: {
-          p_user_id: string
-        }
+        Args: { p_user_id: string }
         Returns: {
           id: string
           market_id: string
@@ -421,10 +423,9 @@ export interface Database {
           created_at: string
         }[]
       }
+
       get_user_positions: {
-        Args: {
-          p_user_id: string
-        }
+        Args: { p_user_id: string }
         Returns: {
           market_id: string
           market_title: string
@@ -436,30 +437,129 @@ export interface Database {
           unrealized_pnl: number
         }[]
       }
+
+      get_user_trade_history: {
+        Args: { p_user_id: string; p_limit?: number }
+        Returns: {
+          id: string
+          market_id: string
+          market_title: string
+          outcome: boolean
+          side: string
+          price: number
+          quantity: number
+          total: number
+          created_at: string
+        }[]
+      }
+
+      place_order: {
+        Args: {
+          p_user_id: string
+          p_market_id: string
+          p_outcome: boolean
+          p_side: string
+          p_order_type: string
+          p_price: number | null
+          p_quantity: number
+        }
+        Returns: Json
+      }
+
+      cancel_order: {
+        Args: { p_user_id: string; p_order_id: string }
+        Returns: Json
+      }
+
+      rpc_deposit_mock: {
+        Args: { p_user_id: string; p_amount: number }
+        Returns: Json
+      }
+
+      rpc_create_market: {
+        Args: {
+          p_title: string
+          p_description: string
+          p_ends_at: string
+          p_initial_liquidity?: number
+          p_image_url?: string | null
+          p_category?: MarketCategory
+        }
+        Returns: Json
+      }
+
+      rpc_resolve_market: {
+        Args: { p_market_id: string; p_winning_outcome: boolean }
+        Returns: Json
+      }
+
+      rpc_buy_shares: {
+        Args: { p_market_id: string; p_outcome: boolean; p_amount: number }
+        Returns: Json
+      }
+
+      rpc_sell_shares: {
+        Args: { p_market_id: string; p_outcome: boolean; p_shares: number }
+        Returns: Json
+      }
+
+      create_platform_orders: {
+        Args: {
+          p_market_id: string
+          p_yes_bid_price: number
+          p_yes_ask_price: number
+          p_quantity: number
+          p_platform_user_id: string
+        }
+        Returns: Json
+      }
+
+      get_admin_payment_report: {
+        Args: { p_market_id?: string | null }
+        Returns: Json
+      }
+
+      record_odds_snapshot: {
+        Args: { p_market_id: string }
+        Returns: void
+      }
     }
   }
 }
 
-// Helper types
-export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
-export type Inserts<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Insert']
-export type Updates<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Update']
+// ============================================
+// Helper Types
+// ============================================
 
-// Tipos específicos
+export type Tables<T extends keyof Database['public']['Tables']> =
+  Database['public']['Tables'][T]['Row']
+
+export type Inserts<T extends keyof Database['public']['Tables']> =
+  Database['public']['Tables'][T]['Insert']
+
+export type Updates<T extends keyof Database['public']['Tables']> =
+  Database['public']['Tables'][T]['Update']
+
+export type Functions = Database['public']['Functions']
+
+// ============================================
+// Table Row Types (shortcuts)
+// ============================================
+
 export type Profile = Tables<'profiles'>
 export type Market = Tables<'markets'>
 export type LedgerEntry = Tables<'ledger_entries'>
 export type MarketPosition = Tables<'market_positions'>
 export type AuditLog = Tables<'audit_logs'>
+export type OddsHistory = Tables<'odds_history'>
+export type Order = Tables<'orders'>
+export type OrderFill = Tables<'order_fills'>
+export type UserShare = Tables<'user_shares'>
 
-// Tipos de resposta das RPCs
-export interface DepositResponse {
-  success: boolean
-  amount: number
-  new_balance: number
-}
+// ============================================
+// RPC Response Types
+// ============================================
 
-// Order Book response types
 export interface PlaceOrderResponse {
   success: boolean
   error?: string
@@ -468,12 +568,114 @@ export interface PlaceOrderResponse {
   remaining_quantity?: number
   avg_price?: number
   total_cost?: number
-  status?: 'open' | 'partial' | 'filled' | 'cancelled'
+  status?: OrderStatus
 }
 
-// Tipo de mercado com odds calculadas
+export interface CancelOrderResponse {
+  success: boolean
+  error?: string
+  order_id?: string
+  filled_quantity?: number
+  cancelled_quantity?: number
+}
+
+export interface DepositResponse {
+  success: boolean
+  amount: number
+  new_balance: number
+}
+
+export interface CreateMarketResponse {
+  success: boolean
+  error?: string
+  market_id?: string
+}
+
+export interface ResolveMarketResponse {
+  success: boolean
+  winning_outcome: boolean
+  total_payout: number
+  winners_count: number
+  cancelled_orders: number
+}
+
+export interface BuySharesResponse {
+  success: boolean
+  shares: number
+  outcome: boolean
+  amount_spent: number
+  new_balance: number
+  price_before: number
+  price_after: number
+}
+
+export interface SellSharesResponse {
+  success: boolean
+  shares_sold: number
+  amount_received: number
+  new_balance: number
+  price_before: number
+  price_after: number
+}
+
+// ============================================
+// Extended Types (with computed fields)
+// ============================================
+
 export interface MarketWithOdds extends Market {
   odds_yes: number
   odds_no: number
   total_liquidity: number
+}
+
+export interface UserPosition {
+  market_id: string
+  market_title: string
+  market_status: MarketStatus
+  outcome: boolean
+  quantity: number
+  avg_cost: number | null
+  current_value: number
+  unrealized_pnl: number
+}
+
+export interface UserOpenOrder {
+  id: string
+  market_id: string
+  market_title: string
+  outcome: boolean
+  side: OrderSide
+  order_type: OrderType
+  price: number
+  quantity: number
+  filled_quantity: number
+  status: OrderStatus
+  created_at: string
+}
+
+export interface TradeHistoryItem {
+  id: string
+  market_id: string
+  market_title: string
+  outcome: boolean
+  side: OrderSide
+  price: number
+  quantity: number
+  total: number
+  created_at: string
+}
+
+export interface BestPrices {
+  best_bid: number | null
+  best_ask: number | null
+  bid_quantity: number | null
+  ask_quantity: number | null
+}
+
+export interface OrderBookLevel {
+  side: OrderSide
+  price: number
+  quantity: number
+  cumulative_quantity: number
+  order_count: number
 }

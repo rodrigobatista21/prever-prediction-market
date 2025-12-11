@@ -8,6 +8,7 @@ import {
   type PlaceOrderResult,
   parseOrderBookData
 } from '@/lib/utils/orderbook'
+import type { PlaceOrderResponse, CancelOrderResponse } from '@/lib/types/database.types'
 
 /**
  * Hook para buscar e assinar o order book de um mercado
@@ -154,7 +155,7 @@ export function usePlaceOrder() {
 
       if (err) throw err
 
-      const result = data as PlaceOrderResult
+      const result = data as PlaceOrderResponse
 
       if (!result.success) {
         setError(result.error || 'Erro ao colocar ordem')
@@ -207,7 +208,7 @@ export function useCancelOrder() {
 
       if (err) throw err
 
-      const result = data as { success: boolean; error?: string }
+      const result = data as CancelOrderResponse
 
       if (!result.success) {
         setError(result.error || 'Erro ao cancelar ordem')
