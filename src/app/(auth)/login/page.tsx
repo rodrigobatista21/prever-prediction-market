@@ -145,51 +145,28 @@ function LoginForm() {
     setIsLoading(true)
     setError(null)
 
-    // Verificar se há sessão ativa
-    const { data: { session } } = await supabase.auth.getSession()
-    console.log('Current session before update:', session ? 'exists' : 'null')
-
-    if (!session) {
-      setError('Sessão expirada. Solicite um novo link de recuperação.')
-      setIsLoading(false)
-      return
-    }
-
-    console.log('Calling updateUser with new password...')
-
-    // Timeout para não travar infinitamente
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Timeout')), 10000)
-    })
+    console.log('Calling updateUser directly...')
 
     try {
-      const updatePromise = supabase.auth.updateUser({ password: newPassword })
-      const result = await Promise.race([updatePromise, timeoutPromise]) as { data: unknown; error: Error | null }
+      // Chamar updateUser diretamente sem verificar sessão antes
+      const { data, error: updateError } = await supabase.auth.updateUser({
+        password: newPassword
+      })
 
-      console.log('updateUser result:', result)
+      console.log('updateUser completed:', { data, error: updateError })
 
-      if (result.error) {
-        console.error('Update password error:', result.error)
-        setError(result.error.message)
+      if (updateError) {
+        console.error('Update password error:', updateError.message)
+        setError(updateError.message)
       } else {
         console.log('Password updated successfully!')
         setPasswordUpdated(true)
       }
     } catch (err) {
       console.error('Catch error:', err)
-      if (err instanceof Error && err.message === 'Timeout') {
-        // Verificar se a senha foi atualizada mesmo com timeout
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-          console.log('User exists after timeout, assuming success')
-          setPasswordUpdated(true)
-        } else {
-          setError('Tempo esgotado. Tente novamente.')
-        }
-      } else {
-        setError('Erro ao atualizar senha. Tente novamente.')
-      }
+      setError('Erro ao atualizar senha. Tente novamente.')
     }
+
     setIsLoading(false)
   }
 
