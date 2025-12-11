@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, Suspense, useEffect } from 'react'
+import { useState, Suspense, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { TrendingUp, Loader2, Mail, ArrowLeft, Check, Lock } from 'lucide-react'
@@ -34,10 +34,12 @@ function LoginForm() {
   const [processingCode, setProcessingCode] = useState(!!searchParams.get('code'))
 
   const supabase = createClient()
+  const subscriptionRef = useRef<{ unsubscribe: () => void } | null>(null)
 
   // Escutar evento PASSWORD_RECOVERY do Supabase
+  // IMPORTANTE: callback NÃO pode ser async - causa deadlock com outras chamadas
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('Auth event:', event, 'Session:', !!session)
 
       if (event === 'PASSWORD_RECOVERY') {
@@ -45,19 +47,19 @@ function LoginForm() {
         setShowResetPassword(true)
         setProcessingCode(false)
       } else if (event === 'SIGNED_IN' && searchParams.get('code')) {
-        // Usuário pode ter sido logado via código de recovery
         console.log('SIGNED_IN with code param - showing reset form')
         setShowResetPassword(true)
         setProcessingCode(false)
       }
     })
 
+    subscriptionRef.current = subscription
+
     // Verificar se já tem sessão (código pode ter sido processado)
     const code = searchParams.get('code')
     if (code) {
       setProcessingCode(true)
 
-      // Timeout para não travar
       const timeoutId = setTimeout(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
           if (session) {
@@ -145,10 +147,17 @@ function LoginForm() {
     setIsLoading(true)
     setError(null)
 
-    console.log('Calling updateUser directly...')
+    // IMPORTANTE: Unsubscribe do listener ANTES de chamar updateUser
+    // O onAuthStateChange pode causar deadlock com outras chamadas do Supabase
+    if (subscriptionRef.current) {
+      console.log('Unsubscribing auth listener before updateUser...')
+      subscriptionRef.current.unsubscribe()
+      subscriptionRef.current = null
+    }
+
+    console.log('Calling updateUser...')
 
     try {
-      // Chamar updateUser diretamente sem verificar sessão antes
       const { data, error: updateError } = await supabase.auth.updateUser({
         password: newPassword
       })
