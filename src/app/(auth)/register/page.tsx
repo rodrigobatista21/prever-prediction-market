@@ -185,11 +185,11 @@ export default function RegisterPage() {
 
           <p className="text-xs text-muted-foreground text-center">
             Ao criar uma conta, você concorda com nossos{' '}
-            <Link href="#" className="underline">
+            <Link href="/termos" className="underline hover:text-foreground">
               Termos de Uso
             </Link>{' '}
             e{' '}
-            <Link href="#" className="underline">
+            <Link href="/privacidade" className="underline hover:text-foreground">
               Política de Privacidade
             </Link>
             .
