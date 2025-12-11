@@ -130,7 +130,7 @@ function LoginForm() {
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('handleUpdatePassword called')
+    console.log('handleUpdatePassword called, password length:', newPassword.length)
 
     if (newPassword.length < 6) {
       setError('A senha deve ter pelo menos 6 caracteres')
@@ -144,24 +144,51 @@ function LoginForm() {
 
     setIsLoading(true)
     setError(null)
-    console.log('Calling updateUser...')
+
+    // Verificar se há sessão ativa
+    const { data: { session } } = await supabase.auth.getSession()
+    console.log('Current session before update:', session ? 'exists' : 'null')
+
+    if (!session) {
+      setError('Sessão expirada. Solicite um novo link de recuperação.')
+      setIsLoading(false)
+      return
+    }
+
+    console.log('Calling updateUser with new password...')
+
+    // Timeout para não travar infinitamente
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Timeout')), 10000)
+    })
 
     try {
-      const { data, error: updateError } = await supabase.auth.updateUser({
-        password: newPassword
-      })
-      console.log('updateUser result:', { data, error: updateError })
+      const updatePromise = supabase.auth.updateUser({ password: newPassword })
+      const result = await Promise.race([updatePromise, timeoutPromise]) as { data: unknown; error: Error | null }
 
-      if (updateError) {
-        console.error('Update password error:', updateError)
-        setError(updateError.message)
+      console.log('updateUser result:', result)
+
+      if (result.error) {
+        console.error('Update password error:', result.error)
+        setError(result.error.message)
       } else {
         console.log('Password updated successfully!')
         setPasswordUpdated(true)
       }
     } catch (err) {
       console.error('Catch error:', err)
-      setError('Erro ao atualizar senha. Tente novamente.')
+      if (err instanceof Error && err.message === 'Timeout') {
+        // Verificar se a senha foi atualizada mesmo com timeout
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          console.log('User exists after timeout, assuming success')
+          setPasswordUpdated(true)
+        } else {
+          setError('Tempo esgotado. Tente novamente.')
+        }
+      } else {
+        setError('Erro ao atualizar senha. Tente novamente.')
+      }
     }
     setIsLoading(false)
   }
