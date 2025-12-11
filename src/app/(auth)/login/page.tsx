@@ -35,47 +35,51 @@ function LoginForm() {
 
   const supabase = createClient()
 
-  // Detectar código de reset na URL
+  // Escutar evento PASSWORD_RECOVERY do Supabase
   useEffect(() => {
-    const code = searchParams.get('code')
-    if (code && !showResetPassword && !passwordUpdated) {
-      setProcessingCode(true)
-      console.log('Processing reset code:', code)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth event:', event, 'Session:', !!session)
 
-      // Trocar código por sessão com timeout
-      const timeoutId = setTimeout(() => {
-        console.error('Timeout ao processar código')
-        setError('Tempo esgotado. Tente novamente.')
+      if (event === 'PASSWORD_RECOVERY') {
+        console.log('PASSWORD_RECOVERY event received')
+        setShowResetPassword(true)
         setProcessingCode(false)
-      }, 10000)
+      } else if (event === 'SIGNED_IN' && searchParams.get('code')) {
+        // Usuário pode ter sido logado via código de recovery
+        console.log('SIGNED_IN with code param - showing reset form')
+        setShowResetPassword(true)
+        setProcessingCode(false)
+      }
+    })
 
-      supabase.auth.exchangeCodeForSession(code)
-        .then(({ data, error }) => {
-          clearTimeout(timeoutId)
-          console.log('exchangeCodeForSession result:', { data, error })
+    // Verificar se já tem sessão (código pode ter sido processado)
+    const code = searchParams.get('code')
+    if (code) {
+      setProcessingCode(true)
 
-          if (error) {
-            console.error('Reset code error:', error.message, error)
-            setError(`Link inválido ou expirado: ${error.message}`)
-            setProcessingCode(false)
-          } else if (data?.session) {
-            console.log('Session created, showing reset form')
+      // Timeout para não travar
+      const timeoutId = setTimeout(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (session) {
+            console.log('Session found after timeout, showing reset form')
             setShowResetPassword(true)
-            setProcessingCode(false)
           } else {
-            console.error('No session returned')
-            setError('Erro ao processar link. Solicite um novo.')
-            setProcessingCode(false)
+            setError('Link expirado ou inválido. Solicite um novo.')
           }
-        })
-        .catch((err) => {
-          clearTimeout(timeoutId)
-          console.error('Catch error:', err)
-          setError('Erro de conexão. Tente novamente.')
           setProcessingCode(false)
         })
+      }, 3000)
+
+      return () => {
+        clearTimeout(timeoutId)
+        subscription.unsubscribe()
+      }
     }
-  }, [searchParams, supabase.auth, showResetPassword, passwordUpdated])
+
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [searchParams, supabase.auth])
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()
