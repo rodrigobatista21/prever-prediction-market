@@ -19,6 +19,11 @@ export type MarketCategory =
   | 'tecnologia'
   | 'internacional'
   | 'outros'
+  | 'macroeconomia'
+  | 'politica_fiscal'
+  | 'politica_monetaria'
+  | 'cripto'
+  | 'geopolitica'
 
 export interface Database {
   public: {

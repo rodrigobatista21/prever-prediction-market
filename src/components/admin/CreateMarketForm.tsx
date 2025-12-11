@@ -22,13 +22,13 @@ import { cn } from '@/lib/utils'
 import type { MarketCategory } from '@/lib/types/database.types'
 
 const CATEGORY_OPTIONS: { value: MarketCategory; label: string }[] = [
-  { value: 'politica', label: 'Política' },
-  { value: 'economia', label: 'Economia' },
-  { value: 'esportes', label: 'Esportes' },
-  { value: 'entretenimento', label: 'Entretenimento' },
+  { value: 'macroeconomia', label: 'Macroeconomia' },
+  { value: 'politica_monetaria', label: 'Política Monetária' },
+  { value: 'politica_fiscal', label: 'Política Fiscal' },
+  { value: 'politica', label: 'Eleições' },
+  { value: 'cripto', label: 'Cripto' },
   { value: 'tecnologia', label: 'Tecnologia' },
-  { value: 'internacional', label: 'Internacional' },
-  { value: 'outros', label: 'Outros' },
+  { value: 'geopolitica', label: 'Geopolítica' },
 ]
 
 interface CreateMarketFormProps {
@@ -41,7 +41,7 @@ export function CreateMarketForm({ onSuccess }: CreateMarketFormProps) {
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
-  const [category, setCategory] = useState<MarketCategory>('outros')
+  const [category, setCategory] = useState<MarketCategory>('macroeconomia')
   const [endsAt, setEndsAt] = useState('')
   const [initialLiquidity, setInitialLiquidity] = useState('1000')
   const [imageUrl, setImageUrl] = useState('')
@@ -162,7 +162,7 @@ export function CreateMarketForm({ onSuccess }: CreateMarketFormProps) {
       // Reset form
       setTitle('')
       setDescription('')
-      setCategory('outros')
+      setCategory('macroeconomia')
       setEndsAt('')
       setInitialLiquidity('1000')
       setImageUrl('')

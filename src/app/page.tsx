@@ -9,11 +9,8 @@ import {
   Clock,
   Landmark,
   DollarSign,
-  Trophy,
-  Tv,
   Cpu,
   Globe,
-  MoreHorizontal,
   Activity,
   ArrowRight,
   ChevronRight,
@@ -31,16 +28,16 @@ import { useMarkets, useMultipleOddsHistory, getSparklineData, calculate24hChang
 import { cn } from '@/lib/utils'
 import { formatBRL } from '@/lib/utils/format'
 
-// Categorias temáticas
+// Categorias temáticas profissionais
 const THEME_CATEGORIES = [
   { id: 'all', label: 'Todos', icon: BarChart3 },
-  { id: 'politica', label: 'Política', icon: Landmark },
-  { id: 'economia', label: 'Economia', icon: DollarSign },
-  { id: 'esportes', label: 'Esportes', icon: Trophy },
-  { id: 'entretenimento', label: 'Entretenimento', icon: Tv },
-  { id: 'tecnologia', label: 'Tecnologia', icon: Cpu },
-  { id: 'internacional', label: 'Internacional', icon: Globe },
-  { id: 'outros', label: 'Outros', icon: MoreHorizontal },
+  { id: 'macroeconomia', label: 'Macro', icon: TrendingUp },
+  { id: 'politica_monetaria', label: 'Pol. Monetária', icon: DollarSign },
+  { id: 'politica_fiscal', label: 'Pol. Fiscal', icon: Landmark },
+  { id: 'politica', label: 'Eleições', icon: Landmark },
+  { id: 'cripto', label: 'Cripto', icon: Cpu },
+  { id: 'tecnologia', label: 'Tech', icon: Cpu },
+  { id: 'geopolitica', label: 'Geopolítica', icon: Globe },
 ] as const
 
 // Filtros especiais
