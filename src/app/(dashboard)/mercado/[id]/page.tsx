@@ -27,6 +27,7 @@ import { CountdownTimer } from '@/components/markets/CountdownTimer'
 import { OutcomeCards } from '@/components/markets/OutcomeCards'
 import { ActivityFeed } from '@/components/markets/ActivityFeed'
 import { MarketOrderBook } from '@/components/markets/MarketOrderBook'
+import { OddsChart } from '@/components/markets/OddsChart'
 import { TradePanel } from '@/components/trading/TradePanel'
 import { useMarket, useAuth, useBalance } from '@/lib/hooks'
 import { formatBRL, formatDate } from '@/lib/utils/format'
@@ -191,6 +192,9 @@ export default function MarketPage({ params }: MarketPageProps) {
             isResolved={isResolved}
             outcome={market.outcome}
           />
+
+          {/* Odds History Chart */}
+          <OddsChart marketId={market.id} className="border-border/50" />
 
           {/* Countdown Timer */}
           {!isResolved && (
