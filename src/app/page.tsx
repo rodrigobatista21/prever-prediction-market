@@ -20,6 +20,13 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { MarketCard } from '@/components/markets/MarketCard'
 import { MarketSearch } from '@/components/markets/MarketSearch'
 import { HeroMarket } from '@/components/markets/HeroMarket'
@@ -46,14 +53,24 @@ const SPECIAL_FILTERS = [
   { id: 'ending', label: 'Encerrando', icon: Clock },
 ] as const
 
+// Opções de ordenação
+const SORT_OPTIONS = [
+  { id: 'volume', label: 'Maior Volume' },
+  { id: 'return', label: 'Maior Retorno' },
+  { id: 'probable', label: 'Mais Prováveis' },
+  { id: 'recent', label: 'Recentes' },
+] as const
+
 type ThemeCategoryId = typeof THEME_CATEGORIES[number]['id']
 type SpecialFilterId = typeof SPECIAL_FILTERS[number]['id'] | null
+type SortOptionId = typeof SORT_OPTIONS[number]['id']
 
 export default function HomePage() {
   const { markets, isLoading, error } = useMarkets()
   const [activeCategory, setActiveCategory] = useState<ThemeCategoryId>('all')
   const [specialFilter, setSpecialFilter] = useState<SpecialFilterId>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [sortBy, setSortBy] = useState<SortOptionId>('volume')
   const [now, setNow] = useState(() => Date.now())
 
   // Update timestamp periodically for time-based filters
@@ -117,12 +134,12 @@ export default function HomePage() {
     setRecentTradesCount(Math.floor(Math.random() * 20) + 5)
   }, [])
 
-  // Filter markets based on category, special filters, and search query
+  // Filter and sort markets based on category, special filters, search query, and sort option
   // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const filteredMarkets = useMemo(() => {
     const query = searchQuery.toLowerCase().trim()
 
-    return markets.filter(market => {
+    const filtered = markets.filter(market => {
       // Filtro de busca por texto
       if (query) {
         const matchesTitle = market.title.toLowerCase().includes(query)
@@ -151,7 +168,32 @@ export default function HomePage() {
 
       return true
     })
-  }, [markets, searchQuery, activeCategory, specialFilter, now])
+
+    // Aplicar ordenação
+    const sorted = [...filtered]
+    switch (sortBy) {
+      case 'volume':
+        sorted.sort((a, b) => b.total_liquidity - a.total_liquidity)
+        break
+      case 'return':
+        // Menor preço = maior retorno potencial
+        sorted.sort((a, b) => {
+          const minA = Math.min(a.odds_yes, a.odds_no)
+          const minB = Math.min(b.odds_yes, b.odds_no)
+          return minA - minB
+        })
+        break
+      case 'probable':
+        // Maior probabilidade SIM primeiro
+        sorted.sort((a, b) => b.odds_yes - a.odds_yes)
+        break
+      case 'recent':
+        sorted.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        break
+    }
+
+    return sorted
+  }, [markets, searchQuery, activeCategory, specialFilter, now, sortBy])
 
   return (
     <div className="space-y-8">
@@ -304,7 +346,7 @@ export default function HomePage() {
               placeholder="Buscar teses..."
             />
 
-            {/* Special filters */}
+            {/* Special filters + Sort dropdown */}
             <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
               {SPECIAL_FILTERS.map((filter) => {
                 const Icon = filter.icon
@@ -327,6 +369,20 @@ export default function HomePage() {
                   </Button>
                 )
               })}
+
+              {/* Sort dropdown */}
+              <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOptionId)}>
+                <SelectTrigger className="h-9 w-[140px] sm:w-[160px] text-xs sm:text-sm">
+                  <SelectValue placeholder="Ordenar por" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SORT_OPTIONS.map((option) => (
+                    <SelectItem key={option.id} value={option.id}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
